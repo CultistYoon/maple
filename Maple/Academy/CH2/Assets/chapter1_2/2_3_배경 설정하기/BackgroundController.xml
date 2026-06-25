@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeBlockFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="d596c359-23cc-4b55-95dc-38ba6e3e7b2f" Language="Lua" Name="BackgroundController" Type="Component" Source="None" ModifyTime="2026-04-09T11:53:44.6297045+09:00">
+  <CoreVersion Major="0" Minor="2" />
+  <ScriptVersion Major="1" Minor="1" />
+  <Description />
+  <Properties />
+  <Methods>
+    <CodeBlockMethod Name="ChangeBackground" ExecSpace="ServerOnly">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments />
+      <Code><![CDATA[
+local background = self.Entity.BackgroundComponent
+	background:ChangeBackgroundByTemplateRUID("04c99668ce5a47e88fba3ac822bc5255")
+	--background:ChangeBackgroundBySolidColor(Color.white)
+	--background:ChangeBackgroundByWebUrl("Http://WebUrl")
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="OnBeginPlay" ExecSpace="ServerOnly">
+      <Return Type="void" SyncDirection="None" />
+      <Code><![CDATA[
+self:ChangeBackground()
+
+]]></Code>
+    </CodeBlockMethod>
+  </Methods>
+  <EntityEventHandlers />
+</CodeBlockFile>

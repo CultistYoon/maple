@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeBlockFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="e13bcec0-e6c5-4e4a-b143-b718cf75c6c6" Language="Lua" Name="LadderSwitch_Hide" Type="Component" Source="None" ModifyTime="2026-05-18T22:39:50.8767276+09:00">
+  <CoreVersion Major="0" Minor="2" />
+  <ScriptVersion Major="1" Minor="1" />
+  <Description />
+  <Properties>
+    <CodeBlockProperty Name="Target" Type="Entity" DefaultValue="nil" SyncDirection="All" />
+  </Properties>
+  <Methods />
+  <EntityEventHandlers>
+    <CodeBlockEntityEventHandler Name="HandleTriggerEnterEvent" EventName="TriggerEnterEvent" ParameterName="event" Target="self" Scope="All">
+      <Code><![CDATA[
+local triggerBodyEntity = event.TriggerBodyEntity
+if triggerBodyEntity == nil then 
+	return 
+end
+
+if self.Target ~= nil then
+	self.Target.Enable = false
+end
+]]></Code>
+    </CodeBlockEntityEventHandler>
+  </EntityEventHandlers>
+</CodeBlockFile>

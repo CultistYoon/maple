@@ -1,0 +1,134 @@
+# UI 엔티티 제어하기
+
+> 📖 **메이플스토리 월드 공식 제작 가이드 문서입니다.** 더 자세하거나 최신 내용이 필요하면 공식 가이드/구글에서 **「UI 엔티티 제어하기」** 로 검색하세요 — 이 페이지 제목은 공식 문서 제목과 동일합니다.
+> _분류: 07 UI · 출처: MapleStory Worlds 공식 위키_
+
+---
+
+학습 과정 소개
+UI 엔티티를 효율적으로 제어하는 방법을 알아봅시다. UI 엔티티를 제어할 때 UI와 서버, 그리고 클라이언트의 관계를 파악해 만들어야 합니다.
+
+참고 가이드
+UI 에디터
+
+UI 제작하기
+
+기본 UI 컴포넌트
+
+UI 엔티티 제어
+엔티티에 접근하는 것과 동일한 방법으로 UI 엔티티에 접근할 수 있습니다. 엔티티에 접근하는 방법은 엔티티와 컴포넌트 참조 가이드를 참고하세요.
+UI 엔티티는 클라이언트 공간에만 존재하므로 서버에서 접근할 수 없습니다. UI 엔티티나 엔티티의 컴포넌트를 받아올 때는 오직 클라이언트 함수에서만 참조해야 합니다. 서버에서 처리된 내용을 UI로 출력하거나 UI를 통해 입력한 내용을 서버에서 처리해야 할 때는 실행제어를 이용해 각 공간에서 수행하도록 해야 합니다.
+
+300
+UIeditor80
+
+버튼 클릭
+버튼을 클릭 했을 때 서버에서 처리를 요청하는 예시입니다.
+
+Method:
+[client only]
+void OnBeginPlay()
+{
+    local button = _EntityService:GetEntityByPath("ButtonEntityPath") 
+    -- 가져올 버튼 엔티티 경로를 "ButtonEntityPath"에 입력합니다.
+    button:ConnectEvent(ButtonClickEvent, self.OnButtonClickClient)
+}
+
+[client only] 
+void OnButtonClickClient()
+{
+    --processing in client..
+    self:OnButtonClickServer()
+}
+
+[server] 
+void OnButtonClickServer()
+{
+    log("Start processing on the server")
+}
+서버 처리 결과 UI로 출력
+Property:
+[None]
+number time = 0
+
+Method:
+[server only]
+void OnUpdate(number delta)
+{
+    self.time = self.time + delta
+    if self.time >= 3 then
+        self.time = 0
+        self:ShowToastMessage("Time Reset")
+    end
+}
+    
+[client] 
+void ShowToastMessage(string text)
+{
+    local toastUIEntity = _EntityService:GetEntityByPath("UIEntityPath") 
+    -- 가져올 UI 엔티티 경로를 "UIEntityPath"에 입력합니다.
+    
+    local textComponent = toastUIEntity.TextComponent
+    
+    -- print toast message
+    textComponent.Text = text
+    toastUIEntity:SetEnable(true)
+     
+    --reservate hide toast message
+    local callback = function()
+        toastUIEntity:SetEnable(false)
+    end
+    _TimerService:SetTimerOnce(callback,3)
+}
+UI 노출 제어
+SetEnable() 함수를 사용해 UI의 노출을 제어할 수 있습니다. 아래 그림과 같이 팝업창을 직접 제작하고 동일 계층으로 UI를 만들었을 경우를 살펴봅시다. 이 팝업창은 동시에 나타나고 사라져야 하므로 모든 엔티티의 Enable을 별도로 설정해야 합니다.
+
+uieditor06
+
+void ShowPopupUI()
+{
+    local PopupUIEntity_1 = _EntityService:GetEntityByPath("/ui/DefaultGroup/MODImage_1")
+    local PopupUIEntity_2 = _EntityService:GetEntityByPath("/ui/DefaultGroup/MODButton_1")
+    local PopupUIEntity_3 = _EntityService:GetEntityByPath("/ui/DefaultGroup/MODButton_1_1")
+    PopupUIEntity_1:SetEnable(true)
+    PopupUIEntity_2:SetEnable(true)
+    PopupUIEntity_3:SetEnable(true)
+}
+ 
+void HidePopupUI()
+{
+    local PopupUIEntity_1 = _EntityService:GetEntityByPath("/ui/DefaultGroup/MODImage_1")
+    local PopupUIEntity_2 = _EntityService:GetEntityByPath("/ui/DefaultGroup/MODButton_1")
+    local PopupUIEntity_3 = _EntityService:GetEntityByPath("/ui/DefaultGroup/MODButton_1_1")
+    PopupUIEntity_1:SetEnable(false)
+    PopupUIEntity_2:SetEnable(false)
+    PopupUIEntity_3:SetEnable(false)
+}
+UI를 제작할 때 UI 기능에 속한 UI 들은 계층 구조를 활용해 부모-자식 관계로 만드는 것을 권장합니다. 특정 UI 엔티티를 최상위 엔티티로 만들고 나머지 UI 엔티티를 자식으로 포함시킵니다. 부모-자식의 특성을 이용해 최상위 엔티티만 참조해 모든 UI 엔티티를 제어할 수 있게됩니다.
+계층 구조를 활용한 노출/숨김 처리 예시 코드입니다.
+
+void ShowPopupUI()
+{
+    local PopupUIEntity = _EntityService:GetEntityByPath("/ui/DefaultGroup/MODImage_1")
+    PopupUIEntity:SetEnable(true)
+}
+ 
+void HidePopupUI()
+{
+    local PopupUIEntity = _EntityService:GetEntityByPath("/ui/DefaultGroup/MODImage_1")
+    PopupUIEntity:SetEnable(false)
+}
+UIGroup 제어
+엔티티의 SetEnable 함수를 활용해 UIGroup를 제어할 수 있습니다.
+
+void ShowUIGroup_1()
+{
+    local UIGroup_1 = _EntityService:GetEntityByPath("/ui/UIGroup_1")
+    UIGroup_1:SetEnable(true)
+}
+ 
+void HideUIGroup_1()
+{
+    local UIGroup_1 = _EntityService:GetEntityByPath("/ui/UIGroup_1")
+    UIGroup_1:SetEnable(false)
+}

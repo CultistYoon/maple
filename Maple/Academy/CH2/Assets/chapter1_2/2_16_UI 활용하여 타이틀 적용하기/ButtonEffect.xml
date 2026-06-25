@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeBlockFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="33fcacfe-036d-433e-9b42-8464cce08eba" Language="Lua" Name="ButtonEffect" Type="Component" Source="None" ModifyTime="2026-06-03T09:56:30.304576+09:00">
+  <CoreVersion Major="0" Minor="2" />
+  <ScriptVersion Major="1" Minor="1" />
+  <Description />
+  <Properties />
+  <Methods />
+  <EntityEventHandlers />
+</CodeBlockFile>

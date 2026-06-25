@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeBlockFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="aa4d14ac-6b40-4a0b-9848-338443852c18" Language="Lua" Name="MonsterDamageSkinController" Type="Component" Source="None" ModifyTime="2026-04-11T17:42:00.443519+09:00">
+  <CoreVersion Major="0" Minor="2" />
+  <ScriptVersion Major="1" Minor="1" />
+  <Description />
+  <Properties />
+  <Methods>
+    <CodeBlockMethod Name="SetDamageSkin" ExecSpace="ServerOnly">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments>
+        <CodeBlockProperty Name="skinRUID" Type="string" SyncDirection="None" />
+      </Arguments>
+      <Code><![CDATA[
+        -- 엔티티에 DamageSkinSettingComponent가 있는지 확인합니다.
+        local setting = self.Entity.DamageSkinSettingComponent
+        if setting == nil then
+            log("DamageSkinSettingComponent가 엔티티에 없습니다.")
+            return
+        end
+        
+        -- 스킨 RUID를 변경하여 몬스터가 맞았을 때의 스킨을 바꿉니다.
+        setting.DamageSkinId = skinRUID
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="OnBeginPlay" ExecSpace="ServerOnly">
+      <Return Type="void" SyncDirection="None" />
+      <Code><![CDATA[
+self:SetDamageSkin("1d90e99a6a86495b8549e0deb2a41a67")
+]]></Code>
+    </CodeBlockMethod>
+  </Methods>
+  <EntityEventHandlers />
+</CodeBlockFile>

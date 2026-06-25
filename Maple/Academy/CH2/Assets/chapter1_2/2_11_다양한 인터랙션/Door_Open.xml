@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeBlockFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="155a53ee-77af-4c81-80c4-7ca22cd8955b" Language="Lua" Name="Door_Open" Type="Component" Source="None" ModifyTime="2026-04-17T18:20:18.5877706+09:00">
+  <CoreVersion Major="0" Minor="2" />
+  <ScriptVersion Major="1" Minor="1" />
+  <Description />
+  <Properties>
+    <CodeBlockProperty Name="TargetDoor" Type="Entity" DefaultValue="a24523cb-5a3a-4dcb-97a3-8af536b7a069" SyncDirection="None" />
+  </Properties>
+  <Methods />
+  <EntityEventHandlers>
+    <CodeBlockEntityEventHandler Name="HandleTriggerEnterEvent" EventName="TriggerEnterEvent" ParameterName="event" Target="self" Scope="Client">
+      <Code><![CDATA[
+if event.TriggerBodyEntity.Name == "Door1_Switch" then
+	if self.TargetDoor ~= nil then
+	-- 문 엔티티를 비활성화하여 사라지게 합니다.
+	self.TargetDoor.Enable = false
+	end
+end
+]]></Code>
+    </CodeBlockEntityEventHandler>
+    <CodeBlockEntityEventHandler Name="HandleTriggerLeaveEvent" EventName="TriggerLeaveEvent" ParameterName="event" Target="self" Scope="Client">
+      <Code><![CDATA[
+-- 플레이어가 벗어나면 문을 다시 활성화합니다.
+if event.TriggerBodyEntity.Name == "Door1_Switch" then
+	if self.TargetDoor ~= nil then
+		wait(6)
+		self.TargetDoor.Enable = true
+	end
+end
+]]></Code>
+    </CodeBlockEntityEventHandler>
+  </EntityEventHandlers>
+</CodeBlockFile>

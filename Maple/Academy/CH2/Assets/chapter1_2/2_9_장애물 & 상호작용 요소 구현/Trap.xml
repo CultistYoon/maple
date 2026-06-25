@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeBlockFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="bff7f6f4-fb8b-4792-b29d-006f51dc9bbc" Language="Lua" Name="Trap" Type="Component" Source="None" ModifyTime="2026-04-09T16:05:35.9745308+09:00">
+  <CoreVersion Major="0" Minor="2" />
+  <ScriptVersion Major="1" Minor="1" />
+  <Description />
+  <Properties />
+  <Methods />
+  <EntityEventHandlers>
+    <CodeBlockEntityEventHandler Name="HandleTriggerEnterEvent" EventName="TriggerEnterEvent" ParameterName="event" Target="self" Scope="Server">
+      <Code><![CDATA[
+local TriggerBodyEntity = event.TriggerBodyEntity
+    
+if TriggerBodyEntity == nil then
+	return
+end
+    
+local playerComponent = TriggerBodyEntity.PlayerComponent
+
+if playerComponent == nil then
+	return
+end
+
+TriggerBodyEntity.HitComponent:OnHit(self.Entity, 100, false, "Missile", 1)
+log("함정 작동! HP: " .. tostring(playerComponent.Hp))
+]]></Code>
+    </CodeBlockEntityEventHandler>
+  </EntityEventHandlers>
+</CodeBlockFile>

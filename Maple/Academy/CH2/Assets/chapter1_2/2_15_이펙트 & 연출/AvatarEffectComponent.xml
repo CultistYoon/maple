@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeBlockFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="97730474-6e17-4b45-9ac7-e269d565d1b4" Language="Lua" Name="AvatarEffectComponent" Type="Component" Source="None" ModifyTime="2026-06-03T14:01:31.7140448+09:00">
+  <CoreVersion Major="0" Minor="2" />
+  <ScriptVersion Major="1" Minor="1" />
+  <Description />
+  <Properties>
+    <CodeBlockProperty Name="serial" Type="integer" DefaultValue="0" SyncDirection="All" />
+  </Properties>
+  <Methods />
+  <EntityEventHandlers>
+    <CodeBlockEntityEventHandler Name="HandleKeyDownEvent" EventName="KeyDownEvent" ParameterName="event" Target="service:InputService" Scope="All">
+      <Code><![CDATA[
+local key = event.key
+local option = {["SyncFlip"] = true, ["Color"] = Color(0, 0, 255, 1)}
+
+if key == KeyboardKey.LeftArrow or key == KeyboardKey.RightArrow then
+    --_EffectService:PlayEffectAttached("cba42a77a12e48059240908f043a86d8", self.Entity, Vector3(0, 0, 0), 0, Vector3(1, 1, 1), false, option)
+    local dash = _EffectService:PlayEffectAttached("cba42a77a12e48059240908f043a86d8", self.Entity, Vector3(0, 0, 0), 0, Vector3(1, 1, 1), true, option)
+    self.serial = dash
+end
+
+]]></Code>
+    </CodeBlockEntityEventHandler>
+    <CodeBlockEntityEventHandler Name="HandleKeyUpEvent" EventName="KeyUpEvent" ParameterName="event" Target="service:InputService" Scope="All">
+      <Code><![CDATA[
+local key = event.key
+local option = {["SyncFlip"] = true, ["Color"] = Color(0, 0, 255, 1)}
+
+if key == KeyboardKey.LeftArrow or key == KeyboardKey.RightArrow then
+	_EffectService:RemoveEffect(self.serial)
+end
+
+]]></Code>
+    </CodeBlockEntityEventHandler>
+  </EntityEventHandlers>
+</CodeBlockFile>

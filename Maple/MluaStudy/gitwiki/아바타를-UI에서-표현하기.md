@@ -1,0 +1,307 @@
+# 아바타를 UI에서 표현하기
+
+> 📖 **메이플스토리 월드 공식 제작 가이드 문서입니다.** 더 자세하거나 최신 내용이 필요하면 공식 가이드/구글에서 **「아바타를 UI에서 표현하기」** 로 검색하세요 — 이 페이지 제목은 공식 문서 제목과 동일합니다.
+> _분류: 03 객체표현 · 출처: MapleStory Worlds 공식 위키_
+
+---
+
+학습 과정 소개
+AvatarGUIRendererComponent를 활용하면 UI에 캐릭터 정보를 보여줄 수 있습니다. 본 과정을 통해 AvatarGUIRendererComponent 활용 방법을 알아봅시다.
+
+참고 가이드
+아바타 애니메이션 제어하기
+
+참고 API Reference
+AvatarGUIRendererComponent
+
+AvatarGUIRendererComponent 프로퍼티
+AvatarGUIRendererComponent의 주요 프로퍼티를 살펴봅시다.
+
+프로퍼티	설명
+Color	색상을 조절합니다.
+FlipX	X축을 기준으로 반전 여부를 결정합니다.
+FlipY	Y축을 기준으로 반전 여부를 결정합니다.
+PlayRate	아바타 애니메이션 재생 속도를 지정할 수 있습니다.
+0 이상의 값을 지원하며 숫자가 클수록 속도가 빨라집니다.
+PreserveAvatar	
+None: 원본 비율과 관계없이 자유롭게 크기를 조절합니다.
+AspectOnly: 원본 비율을 유지하며 크기를 조절합니다.
+NativeSize: 원본 크기를 유지합니다.
+RaycastTarget	true로 설정할 경우 화면 터치 또는 마우스 클릭 대상이 됩니다. AvatarGUIRendererComponent 뒤에 가려진 UI는 화면 터치와 마우스 클릭 입력을 받지 못합니다.
+예제
+AvatarGUIRendererComponent의 프로퍼티를 조절하거나 함수를 활용하여 UI에 보이는 아바타의 모습을 변경해 봅시다
+
+UI에서 아바타 보여주기
+간단하게 UI에서 아바타를 보여주는 방법을 살펴봅시다.
+
+UI 에디터를 연 뒤, [이미지] 버튼을 눌러 엔티티를 추가합니다. 본 예제에서는 DefaultGroup에 추가하겠습니다.
+1
+
+추가한 이미지 엔티티의 이름을 MyInfoWindow로 변경하고 ImageRUID에 아래 내용을 입력합니다. 이후 RectSize에 적당한 값을 입력합니다.
+
+ImageRUID : 8122dd6f67f3d9b4db8a3152172f9063
+
+RectSize : X = 350, Y : 460
+
+Hierarchy에서 콘텍스트 메뉴를 열고 Create Entity - Create UIEmpty를 클릭해서 UIEmpty를 만듭니다.
+
+UIEmpty의 이름을 MyInfo로 변경하고 프로퍼티 에디터에서 CostumeManagerComponent와 AvatarGUIRendererComponent를 추가합니다.
+4
+
+RectSize에 적당한 값을 입력합니다. 그리고 MyInfoWindow 위의 적당한 곳에 위치를 잡아줍니다.
+
+RectSize : X = 270, Y : 400
+3
+
+Hierarchy에서 MyInfo의 위치를 MyInfoWindow 하위로 옮깁니다.
+2
+
+UI 아바타 옷 변경하기
+특정 오브젝트에 부딪히면 캐릭터의 옷이 바뀌고, UI에 보이는 아바타 옷도 바뀌는 예제를 살펴보겠습니다.
+
+Preset List에서 아무 오브젝트나 배치한 뒤, SpriteRUID에 아래의 값을 입력합니다. 그리고 오브젝트의 이름을 Pinkbean으로 변경합니다.
+
+SpriteRUID : 5a81ed24c1354d08b38f8db4b497b607
+5
+
+BaseEnvironment - NativeScripts - Component - TriggerComponent의 콘텍스트 메뉴에서 Extend를 클릭합니다.
+
+확장한 스크립트 컴포넌트의 이름을 ChangeUIAvatar으로 변경합니다.
+
+위에서 배치한 오브젝트인 Pinkbean에 ChangeUIAvatar 컴포넌트를 추가합니다.
+
+ChangeUIAvatar 스크립트를 열고 아래와 같이 프로퍼티를 추가합니다.
+
+Property:
+[None]
+Entity myInfo = /ui/DefaultGroup/MyInfoWindow/MyInfo
+[None]
+string changeCap = "1e6e49a6ecf94cc6872926598dcf179c"
+[None]
+string changeLongcoat = "22ab95fb9c3c4539b04d6a540f464e79"
+[None]
+string changeOHWeapon = "bbe63d40682c4f8ebcdbc22e7d92a5eb"
+Overridable Function에서 OnEnterTriggerBody() 함수를 추가하고 아래와 같이 작성합니다.
+
+override void OnEnterTriggerBody(TriggerEnterEvent enterEvent)
+{
+    __base:OnEnterTriggerBody(enterEvent)
+
+    -- 오브젝트와 충돌한 대상(플레이어)를 받아옴
+    local player = enterEvent.TriggerBodyEntity
+
+    -- 오브젝트와 충돌한 대상에게 AvatarRendererComponent가 없으면 의상 변경 되지 않음
+    local costumeManager = player.CostumeManagerComponent
+    if costumeManager == nil then
+        return
+    end
+
+    -- 내 캐릭터 장비 변경
+    costumeManager.CustomCapEquip = self.changeCap
+    costumeManager.CustomLongcoatEquip = self.changeLongcoat
+    costumeManager.CustomOneHandedWeaponEquip = self.changeOHWeapon
+
+    if self:IsServer() then 
+        return 
+    end
+
+    -- UI 아바타 장비 변경
+    local myInfo = self.myInfo
+    local myInfoCostumeManager = myInfo.CostumeManagerComponent
+
+    myInfoCostumeManager.CustomCapEquip = self.changeCap
+    myInfoCostumeManager.CustomLongcoatEquip = self.changeLongcoat
+    myInfoCostumeManager.CustomOneHandedWeaponEquip = self.changeOHWeapon
+}
+start [시작] 버튼을 누른 뒤 테스트해 봅시다.
+핑크빈 오브젝트에 캐릭터가 닿으면 캐릭터의 의상과 UI 아바타의 의상이 모두 변경되는 것을 확인합니다.
+5
+
+아바타 색상 변경
+스크립트로 AvatarGUIRendererComponent의 Color 프로퍼티를 변경해봅시다. 버튼을 누르면 UI에 보이는 아바타의 색상 값이 랜덤하게 변경되는 예제를 살펴보겠습니다.
+
+UI 에디터에서 버튼을 추가한 뒤 이름을 SetColorBtn으로 입력합니다.
+7
+
+SetColorBtn에 TextComponent를 추가하고 프로퍼티를 아래와 같이 수정합니다.
+
+컴포넌트	프로퍼티	값
+TextComponent	Text	SetColor
+FontColor	#FFFFFF
+ChangeUIAvatar 스크립트 컴포넌트에 SetColor() 함수를 추가하고 아래와 같이 작성합니다. 실행 공간은 client only로 설정합니다.
+
+[client Only]
+void SetColor()
+{
+    local r = _UtilLogic:RandomDouble()
+    local g = _UtilLogic:RandomDouble()
+    local b = _UtilLogic:RandomDouble()
+    local a = _UtilLogic:RandomDouble()
+    self.myInfo.AvatarGUIRendererComponent.Color = Color(r,g,b,a)
+}
+새로 TestUIBtn 스크립트 컴포넌트를 생성합니다.
+그리고 SetColorBtn에 TestUIBtn 컴포넌트를 추가합니다.
+
+TestUIBtn 스크립트를 열고 아래와 같이 프로퍼티를 추가합니다.
+
+Property:
+[None]
+ChangeUIAvatar changeUIAvatar = /maps/map01/Pinkbean
+Tip.
+프로퍼티 타입을 ChangeUIAvatar로 설정하려면, 프로퍼티 타입에서 Component를 클릭한 뒤 ChangeUIAvatar 컴포넌트를 검색해서 추가하면 됩니다.
+
+TestUIBtn 스크립트의 이벤트 핸들러에 ButtonClickEvent를 추가하고 아래와 같이 작성합니다.
+
+[self]
+HandleButtonClickEvent(ButtonClickEvent event)
+{
+    --Parameters
+    local Entity = event.Entity
+    --------------------------------
+    local name = Entity.Name
+    local changeUIAvatar = self.changeUIAvatar
+
+    --Property
+    if name == "SetColorBtn" then
+        changeUIAvatar:SetColor()
+    end
+}
+start [시작] 버튼을 누른 뒤 테스트해 봅시다.
+[SetColor] 버튼을 누를 때마다 UI 아바타의 색상 값이 변경됩니다.
+color
+
+파츠 색상 변경
+버튼을 누르면 UI에 보이는 아바타 파츠 색상 값이 랜덤하게 변경되는 예제입니다.
+
+SetColorBtn 버튼의 콘텍스트 메뉴에서 Duplicate를 클릭해 복제합니다.
+
+버튼의 위치를 적당히 옮기고 이름을 SetPartColorBtn으로 변경합니다.
+
+SetPartColorBtn - TextComponent - Text 프로퍼티에 SetPartColor를 입력합니다.
+
+ChangeUIAvatar 스크립트 컴포넌트에 SetPartColor() 함수를 추가하고 아래와 같이 작성합니다. 실행 공간은 client only로 설정합니다.
+
+[client Only]
+void SetPartColor()
+{
+    local parts = 
+    {
+    	MapleAvatarItemCategory.Body,
+    	MapleAvatarItemCategory.Cap,
+    	MapleAvatarItemCategory.Cape,
+    	MapleAvatarItemCategory.Coat,
+    	MapleAvatarItemCategory.Ear,
+    	MapleAvatarItemCategory.EarAccessory,
+    	MapleAvatarItemCategory.EyeAccessory,
+    	MapleAvatarItemCategory.Face,
+    	MapleAvatarItemCategory.FaceAccessory,
+    	MapleAvatarItemCategory.Glove,
+    	MapleAvatarItemCategory.Hair,
+    	MapleAvatarItemCategory.Head,
+    	MapleAvatarItemCategory.Longcoat,
+    	MapleAvatarItemCategory.OneHandedWeapon,
+    	MapleAvatarItemCategory.Pants,
+    	MapleAvatarItemCategory.Shoes,
+    	MapleAvatarItemCategory.SubWeapon,
+    	MapleAvatarItemCategory.TwoHandedWeapon
+    }
+
+    local r = _UtilLogic:RandomDouble()
+    local g = _UtilLogic:RandomDouble()
+    local b = _UtilLogic:RandomDouble()
+    local a = _UtilLogic:RandomDouble()
+
+    local index = _UtilLogic:RandomIntegerRange(1,18)
+
+    self.myInfo.AvatarGUIRendererComponent:SetAvatarPartColor(parts[index], r, g, b, a)
+}
+TestUIBtn 스크립트의 ButtonClickEvent에 아래 내용을 추가합니다.
+
+[self]
+HandleButtonClickEvent(ButtonClickEvent event)
+{
+    --Parameters
+    local Entity = event.Entity
+    --------------------------------
+    local name = Entity.Name
+    local changeUIAvatar = self.changeUIAvatar
+
+    --Property
+    if name == "SetColorBtn" then
+        changeUIAvatar:SetColor()
+    -- 아래 내용 추가
+    elseif name == "SetPartColorBtn" then
+    	changeUIAvatar:SetPartColor()
+    end
+}
+start [시작] 버튼을 누른 뒤 테스트해 봅시다.
+[SetPartColorBtn] 버튼을 누를 때마다 UI 아바타 랜덤 파츠의 색상 값이 변경됩니다.
+partcolor
+
+감정 표현 변경
+버튼을 누르면 UI에 보이는 아바타 감정 표현이 랜덤하게 변경되는 예제입니다.
+
+SetColorBtn 버튼의 콘텍스트 메뉴에서 Duplicate를 클릭해 복제합니다.
+
+버튼의 위치를 적당히 옮기고 이름을 SetEmotionBtn으로 변경합니다.
+
+SetEmotionBtn - TextComponent - Text 프로퍼티에 SetEmotion을 입력합니다.
+
+ChangeUIAvatar 스크립트 컴포넌트에 SetEmotion() 함수를 추가하고 아래와 같이 작성합니다. 실행 공간은 client only로 설정합니다.
+
+[client Only]
+void SetEmotion()
+{
+    local emotions = 
+    {
+    	EmotionalType.Hit,
+    	EmotionalType.Smile,
+    	EmotionalType.Troubled,
+    	EmotionalType.Cry,
+    	EmotionalType.Angry,
+    	EmotionalType.Bewildered,
+    	EmotionalType.Stunned,
+    	EmotionalType.Vomit,
+    	EmotionalType.Oops,
+    	EmotionalType.Cheers,
+    	EmotionalType.Chu,
+    	EmotionalType.Wink,
+    	EmotionalType.Pain,
+    	EmotionalType.Glitter,
+    	EmotionalType.Despair,
+    	EmotionalType.Love,
+    	EmotionalType.Shine,
+    	EmotionalType.Blaze,
+    	EmotionalType.Hum,
+    	EmotionalType.Bowing,
+    	EmotionalType.Hot,
+    	EmotionalType.Dam,
+    	EmotionalType.qBlue
+    }
+
+    local index = _UtilLogic:RandomIntegerRange(1, 23)
+    self.myInfo.AvatarGUIRendererComponent:PlayEmotion(emotions[index], 3)
+}
+TestUIBtn 스크립트의 ButtonClickEvent에 아래 내용을 추가합니다.
+
+[self]
+HandleButtonClickEvent(ButtonClickEvent event)
+{
+    --Parameters
+    local Entity = event.Entity
+    --------------------------------
+    local name = Entity.Name
+    local changeUIAvatar = self.changeUIAvatar
+
+    --Property
+    if name == "SetColorBtn" then
+        changeUIAvatar:SetColor()
+    elseif name == "SetPartColorBtn" then
+    	changeUIAvatar:SetPartColor()
+    -- 아래 내용 추가
+    elseif name == "SetEmotionBtn" then
+        changeUIAvatar:SetEmotion()
+    end
+}
+start [시작] 버튼을 누른 뒤 테스트해 봅시다.
+[SetEmotion] 버튼을 누를 때마다 UI 아바타 감정 표현이 변경됩니다.

@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeBlockFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="MonsterAttack" Language="Lua" Name="MyMonsterAttackSound" Type="Component" Source="Template" Target="MOD.Core.AttackComponent" ModifyTime="2026-04-18T21:53:02.6573373+09:00">
+  <CoreVersion Major="0" Minor="2" />
+  <ScriptVersion Major="1" Minor="5" />
+  <Description />
+  <Properties>
+    <CodeBlockProperty Name="AttackInterval" Type="number" DefaultValue="0.03" SyncDirection="None">
+      <Attributes xsi:type="MinValueScriptAttribute" Value="0" />
+    </CodeBlockProperty>
+    <CodeBlockProperty Name="Shape" Type="any" DefaultValue="nil" SyncDirection="None">
+      <Attributes xsi:type="HideFromInspectorScriptAttribute" />
+    </CodeBlockProperty>
+    <CodeBlockProperty Name="SpriteSize" Type="Vector2" DefaultValue="Vector2(0,0)" SyncDirection="None">
+      <Attributes xsi:type="HideFromInspectorScriptAttribute" />
+    </CodeBlockProperty>
+    <CodeBlockProperty Name="PositionOffset" Type="Vector2" DefaultValue="Vector2(0,0)" SyncDirection="None">
+      <Attributes xsi:type="HideFromInspectorScriptAttribute" />
+    </CodeBlockProperty>
+  </Properties>
+  <Methods>
+    <CodeBlockMethod Name="OnBeginPlay" ExecSpace="ServerOnly">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments />
+      <Code><![CDATA[
+local monster = self.Entity.Monster
+if not monster then
+	return
+end
+
+self.Shape = BoxShape(Vector2.zero, Vector2.one, 0)
+
+-- sprite 사이즈를 가져와 공격 영역으로 사용한다
+_ResourceService:PreloadAsync({self.Entity.SpriteRendererComponent.SpriteRUID}, function()
+	local clip = _ResourceService:LoadAnimationClipAndWait(self.Entity.SpriteRendererComponent.SpriteRUID)
+	local firstFrameSprite = clip.Frames[1].FrameSprite
+	local firstSpriteSizeInPixel = Vector2(firstFrameSprite.Width, firstFrameSprite.Height)
+	local ppu = firstFrameSprite.PixelPerUnit
+
+	self.SpriteSize = firstSpriteSizeInPixel / ppu
+	self.PositionOffset = (firstSpriteSizeInPixel / 2 - firstFrameSprite.PivotPixel:ToVector2()) / ppu
+	
+	_TimerService:SetTimerRepeat(function() 
+		if monster.IsDead == false then
+			self:AttackNear()
+		end
+	end, self.AttackInterval)
+end)
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="AttackNear" ExecSpace="All">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments />
+      <Code><![CDATA[
+local transformComponent = self.Entity.TransformComponent
+
+if isvalid(transformComponent) then
+	local worldPosition = transformComponent.WorldPosition
+	local scaleX = transformComponent.Scale.x
+	local scaleY = transformComponent.Scale.y
+	local radian = math.rad(transformComponent.ZRotation)
+	local offsetX = math.cos(radian) * self.PositionOffset.x * scaleX - math.sin(radian) * self.PositionOffset.y * scaleY
+	local offsetY = math.sin(radian) * self.PositionOffset.x * scaleX + math.cos(radian) * self.PositionOffset.y * scaleY
+	self.Shape.Size = Vector2(self.SpriteSize.x * math.abs(scaleX), self.SpriteSize.y * math.abs(scaleY))
+	self.Shape.Position = Vector2(worldPosition.x + offsetX, worldPosition.y + offsetY)
+	self.Shape.Angle = transformComponent.ZRotation
+end
+
+self:AttackFast(self.Shape, nil, CollisionGroups.Player)
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="IsAttackTarget" ExecSpace="All">
+      <Return Type="boolean" SyncDirection="None" />
+      <Arguments>
+        <CodeBlockProperty Name="defender" Type="Entity" SyncDirection="None" />
+        <CodeBlockProperty Name="attackInfo" Type="string" SyncDirection="None" />
+      </Arguments>
+      <Code><![CDATA[
+if isvalid(defender.PlayerComponent) == false then
+	return false
+end
+return __base:IsAttackTarget(defender, attackInfo)
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="CalcDamage" ExecSpace="All">
+      <Return Type="int" SyncDirection="None" />
+      <Arguments>
+        <CodeBlockProperty Name="attacker" Type="Entity" SyncDirection="None" />
+        <CodeBlockProperty Name="defender" Type="Entity" SyncDirection="None" />
+        <CodeBlockProperty Name="attackInfo" Type="string" SyncDirection="None" />
+      </Arguments>
+      <Code><![CDATA[
+--[[local damage = __base:CalcDamage(attacker, defender, attackInfo)
+log("attacker = " .. tostring(attacker))
+log("defender = " .. tostring(defender))
+log("attackInfo = " .. tostring(attackInfo))]]
+
+local damage = 10
+log("공격값 = " .. damage)
+
+local soundRUID = "12f187a37805446d86a07e0a58c0e4e6"
+_SoundService:PlaySound(soundRUID, 0.5)
+
+return damage
+]]></Code>
+    </CodeBlockMethod>
+  </Methods>
+  <EntityEventHandlers />
+</CodeBlockFile>

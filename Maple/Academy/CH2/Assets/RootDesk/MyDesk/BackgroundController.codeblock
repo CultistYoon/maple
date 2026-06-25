@@ -1,0 +1,67 @@
+{
+  "Id": "",
+  "GameId": "",
+  "EntryKey": "codeblock://d596c359-23cc-4b55-95dc-38ba6e3e7b2f",
+  "ContentType": "x-mod/codeblock",
+  "Content": "",
+  "Usage": 0,
+  "UsePublish": 1,
+  "UseService": 0,
+  "CoreVersion": "26.5.0.0",
+  "StudioVersion": "0.1.0.0",
+  "DynamicLoading": 0,
+  "ContentProto": {
+    "Use": "Json",
+    "Json": {
+      "CoreVersion": {
+        "Major": 0,
+        "Minor": 2
+      },
+      "ScriptVersion": {
+        "Major": 1,
+        "Minor": 1
+      },
+      "Description": "",
+      "Id": "d596c359-23cc-4b55-95dc-38ba6e3e7b2f",
+      "Language": 1,
+      "Name": "BackgroundController",
+      "Type": 1,
+      "Source": 0,
+      "Target": null,
+      "Properties": [],
+      "Methods": [
+        {
+          "Return": {
+            "Type": "void",
+            "DefaultValue": null,
+            "SyncDirection": 0,
+            "Attributes": [],
+            "Name": null
+          },
+          "Arguments": [],
+          "Code": "local background = self.Entity.BackgroundComponent\n\tbackground:ChangeBackgroundByTemplateRUID(\"036f68db9f8c44b4b0ce2012f8384491\")\n\t--background:ChangeBackgroundBySolidColor(Color.white)\n\t--background:ChangeBackgroundByWebUrl(\"Http://WebUrl\")",
+          "Scope": 2,
+          "ExecSpace": 1,
+          "Attributes": [],
+          "Name": "ChangeBackground"
+        },
+        {
+          "Return": {
+            "Type": "void",
+            "DefaultValue": null,
+            "SyncDirection": 0,
+            "Attributes": [],
+            "Name": null
+          },
+          "Arguments": [],
+          "Code": "self:ChangeBackground()\n",
+          "Scope": 2,
+          "ExecSpace": 1,
+          "Attributes": [],
+          "Name": "OnBeginPlay"
+        }
+      ],
+      "EntityEventHandlers": []
+    }
+  }
+}

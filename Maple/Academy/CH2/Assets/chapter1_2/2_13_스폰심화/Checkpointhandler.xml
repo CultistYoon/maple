@@ -1,0 +1,50 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeBlockFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="447c97f3-ddad-45d2-8e21-713063044c93" Language="Lua" Name="Checkpointhandler" Type="Component" Source="None" ModifyTime="2026-04-15T22:45:21.8492603+09:00">
+  <CoreVersion Major="0" Minor="2" />
+  <ScriptVersion Major="1" Minor="1" />
+  <Description />
+  <Properties />
+  <Methods>
+    <CodeBlockMethod Name="SaveThenLoad" ExecSpace="Server">
+      <Return Type="void" SyncDirection="None" />
+      <Code><![CDATA[
+local data = _DataStorageService:GetGlobalDataStorage("DataTest")
+local position = self.Entity.TransformComponent.Position 
+log(position)
+data:SetAsync("position", tostring(position), function(errorCode, key)
+if errorCode ~= 0 then
+	log("저장 실패: " .. tostring(errorCode))
+	return
+end
+
+log("저장 성공: " .. tostring(key))
+
+data:GetAsync("position", function(loadErrorCode, loadKey, value)
+if loadErrorCode ~= 0 then
+	log("불러오기 실패: " .. tostring(loadErrorCode))
+	return
+end
+
+log("불러오기 성공: position = " .. tostring(loadKey) .. ", value = " .. tostring(value))
+if tostring(value) == tostring(position) then
+	log("확인 완료: 저장된 값과 불러온 값이 같습니다.")
+else
+	log("확인 실패: 값이 다릅니다.")
+end
+end)
+end)
+]]></Code>
+    </CodeBlockMethod>
+  </Methods>
+  <EntityEventHandlers>
+    <CodeBlockEntityEventHandler Name="HandleTriggerEnterEvent" EventName="TriggerEnterEvent" ParameterName="event" Target="self" Scope="Client">
+      <Code><![CDATA[
+local TriggerBodyEntity = event.TriggerBodyEntity
+if TriggerBodyEntity == _UserService.LocalPlayer then 
+	log("체크포인트 통과!")
+	self:SaveThenLoad()
+end
+]]></Code>
+    </CodeBlockEntityEventHandler>
+  </EntityEventHandlers>
+</CodeBlockFile>

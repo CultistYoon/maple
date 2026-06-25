@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeBlockFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="50287811-a4ee-40ca-ac52-054eb2117d3b" Language="Lua" Name="FallDeathWithRespawn" Type="Component" Source="None" ModifyTime="2026-06-12T19:46:24.8069684+09:00">
+  <CoreVersion Major="0" Minor="2" />
+  <ScriptVersion Major="1" Minor="1" />
+  <Description />
+  <Properties>
+    <CodeBlockProperty Name="DeathHeight" Type="number" DefaultValue="-1" SyncDirection="All" />
+    <CodeBlockProperty Name="RespawnPosition" Type="Vector3" DefaultValue="Vector3(0, 0, 0)" SyncDirection="None" />
+    <CodeBlockProperty Name="HasFallen" Type="boolean" DefaultValue="false" SyncDirection="None" />
+    <CodeBlockProperty Name="curMap" Type="string" DefaultValue="&quot;&quot;" SyncDirection="None" />
+  </Properties>
+  <Methods>
+    <CodeBlockMethod Name="OnUpdate" ExecSpace="ServerOnly">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments>
+        <CodeBlockProperty Name="delta" Type="number" SyncDirection="None" />
+      </Arguments>
+      <Code><![CDATA[
+local currentPosition = self.Entity.TransformComponent.Position
+        
+if currentPosition.y <= self.DeathHeight and self.HasFallen == false and self.curMap == "Stage3" then
+	log("죽음")
+	self.HasFallen = true
+	self.Entity.PlayerComponent:ProcessDead()
+end
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="OnBeginPlay" ExecSpace="ServerOnly">
+      <Return Type="void" SyncDirection="None" />
+      <Code><![CDATA[
+self.curMap = self.Entity.CurrentMap.Name
+]]></Code>
+    </CodeBlockMethod>
+  </Methods>
+  <EntityEventHandlers>
+    <CodeBlockEntityEventHandler Name="HandleReviveEvent" EventName="ReviveEvent" ParameterName="event" Target="self" Scope="All">
+      <Code><![CDATA[
+log("다시 살아남")
+self.HasFallen = false
+]]></Code>
+    </CodeBlockEntityEventHandler>
+  </EntityEventHandlers>
+</CodeBlockFile>

@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeBlockFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="c85f8dad-33ad-46e5-9409-28a5043d81f5" Language="Lua" Name="Spring" Type="Extend" Source="None" Target="MOD.Core.TriggerComponent" ModifyTime="2026-04-09T17:10:10.4291909+09:00">
+  <CoreVersion Major="0" Minor="2" />
+  <ScriptVersion Major="1" Minor="1" />
+  <Description />
+  <Properties />
+  <Methods>
+    <CodeBlockMethod Name="OnEnterTriggerBody" ExecSpace="All">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments>
+        <CodeBlockProperty Name="enterEvent" Type="TriggerEnterEvent" SyncDirection="None" />
+      </Arguments>
+      <Code><![CDATA[
+ __base:OnEnterTriggerBody(enterEvent)
+
+    --점프대와 충돌한 대상(플레이어)을 받아옵니다.
+    local player = enterEvent.TriggerBodyEntity
+    log(player.Name)
+    --플레이어의 MovementComponent 컴포넌트를 받아옵니다. 만일 대상에 MovementComponent 없으면 함수를 끝냅니다.
+    local rigidbody = player.RigidbodyComponent
+    if rigidbody == nil then
+    	return
+    end
+
+    --플레이어의 PlayerControllerComponent 컴포넌트를 받아옵니다. 만일 대상에 PlayerControllerComponent 없으면 함수를 끝냅니다.
+    local controller = player.PlayerControllerComponent
+    if controller == nil then
+    	return
+    end
+
+    --캐릭터가 바라보는 방향으로 밀어줍니다. LookDirectionX가 양수라면 오른쪽, 음수라면 왼쪽입니다.
+    if controller.LookDirectionX > 0 then
+        rigidbody:SetForce(Vector2(10,10))    
+    else
+        rigidbody:SetForce(Vector2(-10,10))
+    end
+]]></Code>
+    </CodeBlockMethod>
+  </Methods>
+  <EntityEventHandlers />
+</CodeBlockFile>

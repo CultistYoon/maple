@@ -1,0 +1,34 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeBlockFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="1f591d2b-2b1f-4803-a34f-0e6167d75700" Language="Lua" Name="DoorController" Type="Component" Source="None" ModifyTime="2026-04-16T20:29:18.7471217+09:00">
+  <CoreVersion Major="0" Minor="2" />
+  <ScriptVersion Major="1" Minor="1" />
+  <Description />
+  <Properties />
+  <Methods>
+    <CodeBlockMethod Name="Open" ExecSpace="ServerOnly">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments />
+      <Code><![CDATA[
+-- 문을 여는 로직 (예: 문 이동)
+self.Entity.TransformComponent.Position = Vector3(5, 0, 0)
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="Close" ExecSpace="ServerOnly">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments />
+      <Code><![CDATA[
+-- 문을 닫는 로직 (예: 문 이동)
+self.Entity.TransformComponent.Position = Vector3(0, 0, 0)
+]]></Code>
+    </CodeBlockMethod>
+  </Methods>
+  <EntityEventHandlers>
+    <CodeBlockEntityEventHandler Name="HandleInteractionEvent" EventName="InteractionEvent" ParameterName="event" Target="self" Scope="All">
+      <Code><![CDATA[
+        -- 상호작용 시 문을 여는 함수 호출
+log("상호작용")
+self:Open()
+]]></Code>
+    </CodeBlockEntityEventHandler>
+  </EntityEventHandlers>
+</CodeBlockFile>

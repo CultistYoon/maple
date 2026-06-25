@@ -1,0 +1,61 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeBlockFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="b100f323-78e5-45a4-a4be-d88f18a57eb9" Language="Lua" Name="PlayerRevivehandler" Type="Component" Source="None" ModifyTime="2026-04-15T23:08:20.0650252+09:00">
+  <CoreVersion Major="0" Minor="2" />
+  <ScriptVersion Major="1" Minor="1" />
+  <Description />
+  <Properties />
+  <Methods />
+  <EntityEventHandlers>
+    <CodeBlockEntityEventHandler Name="HandleReviveEvent" EventName="ReviveEvent" ParameterName="event" Target="self" Scope="Server">
+      <Code><![CDATA[
+local revivedEntity = event
+log("부활했습니다!")
+
+local data = _DataStorageService:GetGlobalDataStorage("DataTest")
+
+-- 변수 선언
+local x = nil
+local y = nil
+local z = nil
+
+local callBack = function(errorcode, key, value) 
+	if key == "position" then 
+		log(value)
+		log("값이 같같습니다.")
+		
+		if value ~= nil then
+		
+			--local str = "(-4.257, 0.390, 999.999)"
+			local str = value
+		
+            -- 1. 불필요한 문자 제거 (괄호 제거)
+        	local cleanStr = str:gsub("%(", ""):gsub("%)", "")
+        
+        	-- 2. 콤마(,)를 기준으로 값 분리
+        	local parts = _UtilLogic:Split(cleanStr, ",")
+        
+        	-- 3. 각 부분을 숫자로 변환
+        	x = tonumber(parts[1])
+        	y = tonumber(parts[2])
+        	z = tonumber(parts[3])
+        
+        	-- 4. Vector3 생성
+        	local targetPosition = Vector3(x, y, z)
+			log(targetPosition)
+            
+        else
+            log("value가 nil입니다.")
+        end
+		
+       	--self.Entity.PlayerComponent:SetWorldPosition(Vector3(-4.257, 0.390, 999.999))
+		self.Entity.PlayerComponent:SetWorldPosition(Vector3(x, y, z))
+
+	end 
+end 
+
+data:GetAsync("position", callBack)
+
+]]></Code>
+    </CodeBlockEntityEventHandler>
+  </EntityEventHandlers>
+</CodeBlockFile>

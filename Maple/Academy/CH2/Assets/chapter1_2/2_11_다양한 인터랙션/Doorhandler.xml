@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeBlockFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="e56574c4-ef4e-4e1f-8371-df10fdd3dd3b" Language="Lua" Name="Doorhandler" Type="Component" Source="None" ModifyTime="2026-05-18T23:19:21.2794337+09:00">
+  <CoreVersion Major="0" Minor="2" />
+  <ScriptVersion Major="1" Minor="1" />
+  <Description />
+  <Properties>
+    <CodeBlockProperty Name="pushDirection" Type="Vector2" DefaultValue="Vector2(0,0)" SyncDirection="All" />
+  </Properties>
+  <Methods />
+  <EntityEventHandlers>
+    <CodeBlockEntityEventHandler Name="HandleTriggerEnterEvent" EventName="TriggerEnterEvent" ParameterName="event" Target="self" Scope="Client">
+      <Code><![CDATA[
+local player = event.TriggerBodyEntity
+
+local movement = player.MovementComponent
+if movement == nil then return end
+
+-- 왼쪽을 보는지 확인
+local isMovingLeft = movement:IsFaceLeft()
+
+-- (0, 0) 으로 초기화
+self.pushDirection = Vector2.zero
+
+-- 값이 작을 경우 벗어날 수 있음 최소 8 
+if isMovingLeft then
+	self.pushDirection = Vector2(8, 0)
+else
+	self.pushDirection = Vector2(-8, 0)
+end
+
+log(self.pushDirection)
+
+local rigidbody = player.RigidbodyComponent
+if rigidbody ~= nil then
+	-- 설정한 방향으로 힘을 가함
+	rigidbody:SetForce(self.pushDirection)
+end
+]]></Code>
+    </CodeBlockEntityEventHandler>
+  </EntityEventHandlers>
+</CodeBlockFile>

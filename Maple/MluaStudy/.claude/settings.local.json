@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python3 *)",
+      "Bash(grep -v ' total$')",
+      "Bash(awk '{print $1}')",
+      "Bash(awk '{a[NR]=$1; s+=$1} END{print \"문서수:\",NR; print \"최소:\",a[1],\"줄\"; print \"중앙값:\",a[int\\(NR/2\\)],\"줄\"; print \"최대:\",a[NR],\"줄\"; print \"평균:\",int\\(s/NR\\),\"줄\"}')",
+      "Bash(rm -rf '/Users/user/Library/CloudStorage/GoogleDrive-yoony4175@gmail.com/My Drive/02회사문서/차호채움/outputs/gitwiki-template')",
+      "Read(//Users/user/Library/CloudStorage/GoogleDrive-yoony4175@gmail.com/My Drive/02회사문서/차호채움/outputs/**)"
+    ]
+  }
+}

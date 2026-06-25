@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeBlockFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="0e00f755-8ee2-47ee-b22f-515a986f55ee" Language="Lua" Name="JumpMovement" Type="Component" Source="None" ModifyTime="2026-04-12T12:40:18.6679494+09:00">
+  <CoreVersion Major="0" Minor="2" />
+  <ScriptVersion Major="1" Minor="1" />
+  <Description />
+  <Properties />
+  <Methods>
+    <CodeBlockMethod Name="OnBeginPlay" ExecSpace="ServerOnly">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments />
+      <Code><![CDATA[
+        local tweenLine = self.Entity.TweenLineComponent
+        
+        if tweenLine == nil then
+            tweenLine = self.Entity:AddComponent(TweenLineComponent)
+        end
+
+        tweenLine.Positions:Clear()
+        tweenLine.Positions:Add(Vector2(0, 0))     -- 왼쪽
+        tweenLine.Positions:Add(Vector2(0, 3))     -- 위
+
+        tweenLine.Duration = 8          -- 숫자 높일수록 더 천천히 이동
+        tweenLine.StopType = TweenLinearStopType.RepeatRoundTrip
+        tweenLine.AutoStart = true
+]]></Code>
+    </CodeBlockMethod>
+  </Methods>
+  <EntityEventHandlers />
+</CodeBlockFile>
