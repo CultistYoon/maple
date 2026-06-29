@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeBlockFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="d10c1f0e-0dc4-4339-800b-2f8e9890d89c" Language="Lua" Name="Drop_Item_Component" Type="Component" Source="None" ModifyTime="2026-06-06T11:18:24.4970157+09:00">
+  <CoreVersion Major="0" Minor="2" />
+  <ScriptVersion Major="1" Minor="1" />
+  <Description />
+  <Properties />
+  <Methods>
+    <CodeBlockMethod Name="DropItem" ExecSpace="Server">
+      <Return Type="void" SyncDirection="None" />
+      <Code><![CDATA[
+local modelID = "model://fa15de67-b9e6-4a94-8e9e-aca831248aa3"
+local modelName = "Coin"
+local potionX = self.Entity.TransformComponent.Position.x
+local potionY = self.Entity.TransformComponent.Position.y
+local parent = _EntityService:GetEntityByPath("/maps/map01")
+
+math.randomseed(os.time())
+if math.random(1, 100) > 70 then
+	log("코인이 생겼어요~")
+	_SpawnService:SpawnByModelId(modelID, modelName, Vector3(potionX, potionY, 0), parent)
+end
+]]></Code>
+    </CodeBlockMethod>
+  </Methods>
+  <EntityEventHandlers>
+    <CodeBlockEntityEventHandler Name="HandleDeadEvent" EventName="DeadEvent" ParameterName="event" Target="self" Scope="Client">
+      <Code><![CDATA[
+--log("죽었습니다~")
+self:DropItem()
+]]></Code>
+    </CodeBlockEntityEventHandler>
+  </EntityEventHandlers>
+</CodeBlockFile>

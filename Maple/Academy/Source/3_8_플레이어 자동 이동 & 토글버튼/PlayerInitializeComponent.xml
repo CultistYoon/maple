@@ -1,0 +1,24 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeBlockFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="769487ae-f2fe-4e66-97c8-5756a09643b4" Language="Lua" Name="PlayerInitializeComponent" Type="Component" Source="None" ModifyTime="2026-05-09T22:06:51.7670098+09:00">
+  <CoreVersion Major="0" Minor="2" />
+  <ScriptVersion Major="1" Minor="1" />
+  <Description />
+  <Properties />
+  <Methods>
+    <CodeBlockMethod Name="OnBeginPlay" ExecSpace="All">
+      <Return Type="void" SyncDirection="None" />
+      <Code><![CDATA[
+local playerCam = self.Entity.CameraComponent
+if playerCam == nil then
+	return
+end
+
+playerCam.CameraOffset = Vector2(2, 0)
+playerCam.DeadZone = Vector2(0,0)
+playerCam.SoftZone = Vector2(0,0)
+playerCam.ZoomRatio = 150
+]]></Code>
+    </CodeBlockMethod>
+  </Methods>
+  <EntityEventHandlers />
+</CodeBlockFile>

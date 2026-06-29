@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeBlockFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="e6fb7c27-a38e-4a59-9523-85351fd71f50" Language="Lua" Name="InstanceGameManager" Type="Component" Source="None" ModifyTime="2026-04-19T20:35:39.9368842+09:00">
+  <CoreVersion Major="0" Minor="2" />
+  <ScriptVersion Major="1" Minor="1" />
+  <Description />
+  <Properties />
+  <Methods>
+    <CodeBlockMethod Name="OnBeginPlay" ExecSpace="ServerOnly">
+      <Return Type="void" SyncDirection="None" />
+      <Code><![CDATA[
+local playFunc = function()
+	local users = {}
+	-- 현재 룸에 존재하는 플레이어들을 가져옵니다.
+	for k, v in pairs(_UserService.UserEntities) do
+		users[#users+1] = v.Name
+	end
+	-- 해당 플레이어들을 정적 룸으로 돌려보냅니다.
+	_RoomService:MoveUsersToStaticRoom(users)
+end
+
+-- 게임이 시작되고 10초가 지난 후 playFunc 함수가 실행되도록 합니다.
+--_TimerService:SetTimerOnce(playFunc, 10.0)
+]]></Code>
+    </CodeBlockMethod>
+  </Methods>
+  <EntityEventHandlers />
+</CodeBlockFile>

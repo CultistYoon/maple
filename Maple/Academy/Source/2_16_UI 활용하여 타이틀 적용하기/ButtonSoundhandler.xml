@@ -1,0 +1,18 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeBlockFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="accd69aa-ee78-42f7-b77d-1a9f1442c6bb" Language="Lua" Name="ButtonSoundhandler" Type="Component" Source="None" ModifyTime="2026-06-17T17:49:30.9651593+09:00">
+  <CoreVersion Major="0" Minor="2" />
+  <ScriptVersion Major="1" Minor="1" />
+  <Description />
+  <Properties />
+  <Methods />
+  <EntityEventHandlers>
+    <CodeBlockEntityEventHandler Name="HandleButtonClickEvent" EventName="ButtonClickEvent" ParameterName="event" Target="self" Scope="All">
+      <Code><![CDATA[
+local soundEffect = "013b506924354c5f82bc43cdc7646d66"
+local volume = 1.0
+_SoundService:PlaySound(soundEffect, volume)
+
+]]></Code>
+    </CodeBlockEntityEventHandler>
+  </EntityEventHandlers>
+</CodeBlockFile>

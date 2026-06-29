@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeBlockFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="ed11242a-c293-4c25-841e-f7c712377d69" Language="Lua" Name="MapNameDisplay" Type="Component" Source="None" ModifyTime="2026-06-18T21:51:20.1970399+09:00">
+  <CoreVersion Major="0" Minor="2" />
+  <ScriptVersion Major="1" Minor="1" />
+  <Description />
+  <Properties>
+    <CodeBlockProperty Name="lastMapName" Type="string" DefaultValue="&quot;&quot;" SyncDirection="None" />
+  </Properties>
+  <Methods>
+    <CodeBlockMethod Name="OnBeginPlay" ExecSpace="ClientOnly">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments />
+      <Code><![CDATA[
+-- UI is client-only; show the current map name as soon as the HUD starts.
+log("[MapNameDisplay] OnBeginPlay")
+self:UpdateMapName()
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="OnUpdate" ExecSpace="ClientOnly">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments>
+        <CodeBlockProperty Name="delta" Type="number" SyncDirection="None" />
+      </Arguments>
+      <Code><![CDATA[
+-- Poll the local player's current map every frame; the label refreshes only when it actually changes.
+self:UpdateMapName()
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="UpdateMapName" ExecSpace="ClientOnly">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments />
+      <Code><![CDATA[
+-- Reads LocalPlayer.CurrentMapName and writes it into this entity's TextComponent when it differs from the last value.
+local player = _UserService.LocalPlayer
+if not isvalid(player) then return end
+
+local mapName = player.CurrentMapName
+if mapName == nil or mapName == "" then return end
+if mapName == self.lastMapName then return end
+
+self.lastMapName = mapName
+
+local textComp = self.Entity.TextComponent
+if isvalid(textComp) then
+	textComp.Text = mapName
+	log("[MapNameDisplay] map -> " .. mapName)
+end
+]]></Code>
+    </CodeBlockMethod>
+  </Methods>
+  <EntityEventHandlers />
+</CodeBlockFile>

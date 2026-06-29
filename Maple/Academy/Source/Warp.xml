@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeBlockFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="68a75f9f-9f84-49f4-80f5-0bc5372389a7" Language="Lua" Name="Warp" Type="Component" Source="None" ModifyTime="2026-06-16T19:21:48.8287449+09:00">
+  <CoreVersion Major="0" Minor="2" />
+  <ScriptVersion Major="1" Minor="1" />
+  <Description />
+  <Properties>
+    <CodeBlockProperty Name="WorldId" Type="string" DefaultValue="&quot;&quot;" SyncDirection="All" />
+  </Properties>
+  <Methods>
+    <CodeBlockMethod Name="Warp" ExecSpace="Server">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments>
+        <CodeBlockProperty Name="userId" Type="string" DefaultValue="&quot;&quot;" SyncDirection="None" />
+      </Arguments>
+      <Code><![CDATA[
+local warpDataTable = {}
+warpDataTable.userId = userId
+
+local serializedData = _UtilLogic:TableToString(warpDataTable)
+
+_TeleportService:WarpUserToWorldAndWait(userId, self.WorldId, serializedData)
+]]></Code>
+    </CodeBlockMethod>
+  </Methods>
+  <EntityEventHandlers>
+    <CodeBlockEntityEventHandler Name="HandlePortalUseEvent" EventName="PortalUseEvent" ParameterName="event" Target="self" Scope="All">
+      <Code><![CDATA[
+--------------- Native Event Sender Info ----------------
+-- Sender: PortalComponent
+-- Space: Client
+---------------------------------------------------------
+
+-- Parameters
+local PortalUser = event.PortalUser
+---------------------------------------------------------
+self:Warp(PortalUser.Name)
+]]></Code>
+    </CodeBlockEntityEventHandler>
+  </EntityEventHandlers>
+</CodeBlockFile>

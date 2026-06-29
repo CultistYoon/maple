@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeBlockFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="dbb7d69e-fe45-42ae-a385-5184ceaaa0a5" Language="Lua" Name="LadderSwitch" Type="Component" Source="None" ModifyTime="2026-06-15T18:09:09.2704207+09:00">
+  <CoreVersion Major="0" Minor="2" />
+  <ScriptVersion Major="1" Minor="1" />
+  <Description />
+  <Properties>
+    <CodeBlockProperty Name="Target" Type="Entity" DefaultValue="nil" SyncDirection="All" />
+  </Properties>
+  <Methods />
+  <EntityEventHandlers>
+    <CodeBlockEntityEventHandler Name="HandleTriggerEnterEvent" EventName="TriggerEnterEvent" ParameterName="event" Target="self" Scope="Server">
+      <Code><![CDATA[
+local TriggerBodyEntity = event.TriggerBodyEntity
+--log(event)
+--log(TriggerBodyEntity)
+--log(TriggerBodyEntity.Name)
+
+if TriggerBodyEntity == nil then 
+	return 
+end
+
+if self.Target ~= nil then
+	log("사다리가 나타납니다.")
+    --self.Target.Enable = true
+	self.Target.Enable = not self.Target.Enable
+end 
+]]></Code>
+    </CodeBlockEntityEventHandler>
+  </EntityEventHandlers>
+</CodeBlockFile>

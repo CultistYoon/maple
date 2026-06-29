@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeBlockFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="f2736061-4d55-4b88-b50b-3e605bf20e60" Language="Lua" Name="Button_TextToggle" Type="Logic" Source="None" ModifyTime="2026-05-05T20:37:38.1269033+09:00">
+  <CoreVersion Major="0" Minor="2" />
+  <ScriptVersion Major="1" Minor="1" />
+  <Description />
+  <Properties />
+  <Methods>
+    <CodeBlockMethod Name="OnBeginPlay" ExecSpace="ClientOnly">
+      <Return Type="void" SyncDirection="None" />
+      <Code><![CDATA[
+local btn = _EntityService:GetEntityByPath("/ui/UIGroup/UIButton")
+local text = _EntityService:GetEntityByPath("/ui/UIGroup/UIText")
+local testFunction = function()
+	text:SetEnable(not text.Enable)
+end
+btn:ConnectEvent(ButtonClickEvent, testFunction)
+]]></Code>
+    </CodeBlockMethod>
+  </Methods>
+  <EntityEventHandlers />
+</CodeBlockFile>

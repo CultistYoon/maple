@@ -1,0 +1,280 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeBlockFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="caa729ed-65d4-4a47-afaf-4d532414154c" Language="Lua" Name="MatchLogic" Type="Logic" Source="None" ModifyTime="2023-03-09T19:08:33.6053329+09:00">
+  <CoreVersion Major="0" Minor="2" />
+  <ScriptVersion Major="1" Minor="0" />
+  <Description />
+  <Properties>
+    <CodeBlockProperty Name="minPlayerCnt" Type="number" DefaultValue="1--최소 매칭 인원" SyncDirection="All" />
+    <CodeBlockProperty Name="maxPlayerCnt" Type="number" DefaultValue="5--최대 매칭 인원" SyncDirection="All" />
+    <CodeBlockProperty Name="waitingDuration" Type="number" DefaultValue="5--매칭 대기하는 시간" SyncDirection="None" />
+    <CodeBlockProperty Name="resetDurationByCancel" Type="boolean" DefaultValue="true--누군가매칭을 취소하면 대기시간을 초기화합니다" SyncDirection="None" />
+    <CodeBlockProperty Name="isEventMatchType" Type="boolean" DefaultValue="false--이벤트매칭 사용여부입니다" SyncDirection="None" />
+    <CodeBlockProperty Name="eventMatchPeriod" Type="number" DefaultValue="10--이벤트매칭의 주기입니다" SyncDirection="None" />
+    <CodeBlockProperty Name="logMessage" Type="string" DefaultValue="&quot;%d초후 게임이 시작됩니다&quot;" SyncDirection="None" />
+    <CodeBlockProperty Name="multipleMatching" Type="number" DefaultValue="1--배수 매칭입니다(1:기본, 2일 경우 짝수 매칭)" SyncDirection="None" />
+  </Properties>
+  <Methods>
+    <CodeBlockMethod Name="OnBeginPlay" ExecSpace="ServerOnly">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments />
+      <Code><![CDATA[
+self._T.instanceMapCnt = 0
+self._T.readyCnt = 0
+self.minPlayerCnt = math.ceil(self.minPlayerCnt/self.multipleMatching) * self.multipleMatching
+self.maxPlayerCnt = math.ceil(self.maxPlayerCnt/self.multipleMatching) * self.multipleMatching 
+self:SetMatchState(_MatchEnum.NONE)
+
+
+
+if  _RoomService:IsInstanceRoom() == false then
+	local onUserEnterEvent = function(event)			
+			local user = _UserService:GetUserEntityByUserId(event.UserId)
+			if _EntityService:IsValid(user) then
+				self:OnReadyResult(user.PlayerComponent.UserId,false,self._T.readyCnt ,self._T.matchState,user.OwnerId)
+			end
+		end
+	self._T.onUserEnterEvent = _UserService:ConnectEvent(UserEnterEvent,onUserEnterEvent)
+end
+
+if self.isEventMatchType == false then
+	self:SetMatchState(_MatchEnum.WAIT)
+else		
+	if _RoomService:IsInstanceRoom() == false then
+		self:InitEventMatch()
+	end
+end
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="SetReady" ExecSpace="Server">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments>
+        <CodeBlockProperty Name="player" Type="Entity" SyncDirection="None" />
+        <CodeBlockProperty Name="ready" Type="boolean" SyncDirection="None" />
+      </Arguments>
+      <Code><![CDATA[
+if _RoomService:IsInstanceRoom() then
+	return
+end
+if self.isEventMatchType == false then
+	if self._T.matchState == _MatchEnum.FINAL_READY then
+		if self.resetDurationByCancel and ready == false then
+			self:SetMatchState(_MatchEnum.WAIT)
+			self:StartFinalReady(false)
+		end
+	end
+end
+self._T.readyCnt = self:CheckReadyPlayer()
+self:OnReadyResult(player.PlayerComponent.UserId,ready,self._T.readyCnt ,self._T.matchState)
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="OnReadyResult" ExecSpace="Client">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments>
+        <CodeBlockProperty Name="playerId" Type="string" SyncDirection="None" />
+        <CodeBlockProperty Name="ready" Type="boolean" SyncDirection="None" />
+        <CodeBlockProperty Name="playerCnt" Type="number" SyncDirection="None" />
+        <CodeBlockProperty Name="matchState" Type="number" SyncDirection="None" />
+      </Arguments>
+      <Code><![CDATA[
+local ReadyEvent = MatchReadyEvent(playerId,ready,playerCnt,matchState)
+self:SendEvent(ReadyEvent)
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="StartFinalReady" ExecSpace="Server">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments>
+        <CodeBlockProperty Name="start" Type="boolean" SyncDirection="None" />
+      </Arguments>
+      <Code><![CDATA[
+if self._T.timerId ~= nil and self._T.timerId > 0 then	
+	_TimerService:ClearTimer(self._T.timerId)
+	self._T.timerId = 0
+	self:SetMatchLog("")
+end
+if start then
+	local time = math.floor(self.waitingDuration)
+	self._T.timerId = 0
+	local timer = function()
+		local log = string.format(self.logMessage,time)	
+		time = time - 1
+		if time < 0 then
+			log = ""
+			_TimerService:ClearTimer(self._T.timerId)
+			self:StartEnterGame()
+		end
+		self:SetMatchLog(log)
+	end
+	self._T.timerId = _TimerService:SetTimerRepeat(timer,1,0)
+end
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="SetMatchLog" ExecSpace="Client">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments>
+        <CodeBlockProperty Name="log" Type="string" SyncDirection="None" />
+      </Arguments>
+      <Code><![CDATA[
+self:SendEvent(MatchLogEvent(log))
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="StartEnterGame" ExecSpace="Server">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments />
+      <Code><![CDATA[
+local readyCnt = self:CheckReadyPlayer()
+if readyCnt >= self.minPlayerCnt then	
+	self:MoveToInstanceMap()
+end
+self:SetMatchState(_MatchEnum.NONE)
+if self.isEventMatchType == false then
+	wait(1)
+	self:SetMatchState(_MatchEnum.WAIT)
+	self:CheckReadyPlayer()
+end
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="CheckReadyPlayer" ExecSpace="All">
+      <Return Type="number" SyncDirection="None" />
+      <Arguments />
+      <Code><![CDATA[
+local users = _UserService.UserEntities
+if users == nil or users.Count == 0 then
+	return 0
+end
+
+local readyCnt = 0
+for k,v in pairs(users) do
+	if v.PlayerMatch ~=nil and v.PlayerMatch.isReady then
+		readyCnt = readyCnt + 1
+	end
+end
+if self.isEventMatchType == false then
+	if readyCnt >= self.minPlayerCnt then
+		if self._T.matchState ~= _MatchEnum.FINAL_READY then
+			self:SetMatchState(_MatchEnum.FINAL_READY)
+			self:StartFinalReady(true)
+		end
+	else
+		if self._T.matchState == _MatchEnum.FINAL_READY then
+			self:SetMatchState(_MatchEnum.WAIT)
+			self:StartFinalReady(false)
+		end	
+	end
+end
+return readyCnt
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="SetMatchState" ExecSpace="All">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments>
+        <CodeBlockProperty Name="matchState" Type="number" SyncDirection="None" />
+      </Arguments>
+      <Code><![CDATA[
+if matchState == self._T.matchState then
+	return
+end
+self._T.matchState = matchState
+self:OnChangeMatchState(matchState)
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="OnChangeMatchState" ExecSpace="Client">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments>
+        <CodeBlockProperty Name="matchState" Type="number" SyncDirection="None" />
+      </Arguments>
+      <Code><![CDATA[
+self:SendEvent(MatchStateEvent(matchState))
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="MoveToInstanceMap" ExecSpace="Server">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments />
+      <Code><![CDATA[
+local users = _UserService.UserEntities
+if users == nil or users.Count == 0 then
+	return
+end
+local readyCnt = 0
+local userTable = {}
+
+for k,v in pairs(users) do
+	local user = v.PlayerMatch
+	if user ~=nil and user.isReady then
+		readyCnt = readyCnt + 1
+		table.insert(userTable,user)
+	end
+end
+table.sort(userTable,function(a,b) return a.readyClickTime < b.readyClickTime  end)
+--매칭 시간이 긴 사람부터 매칭 시작
+
+-- 중복되지 않는 인스턴스 룸 식별자를 만듭니다.
+local roomKey = "Room " .. tostring(self._T.instanceMapCnt)
+self._T.instanceMapCnt = self._T.instanceMapCnt + 1
+
+local multiplePlayerCnt = math.floor(readyCnt/self.multipleMatching) * self.multipleMatching
+local maxPlayerCnt = math.min(self.maxPlayerCnt,multiplePlayerCnt)
+
+local instanceMap = _RoomService:GetOrCreateInstanceRoom(roomKey)
+local usersIds = {}
+local moveUserCnt = 0
+for k,v in pairs(userTable) do
+	local user = v
+	if moveUserCnt < maxPlayerCnt then
+		table.insert(usersIds,v.Entity.PlayerComponent.UserId)
+		moveUserCnt = moveUserCnt + 1
+	else
+		break
+	end	
+end
+instanceMap:MoveUsers(usersIds)
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="ExitInstanceMap" ExecSpace="Server">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments>
+        <CodeBlockProperty Name="userId" Type="string" SyncDirection="None" />
+      </Arguments>
+      <Code><![CDATA[
+_RoomService:MoveUserToStaticRoom(userId)
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="ExitInstanceMapAllUser" ExecSpace="Server">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments />
+      <Code><![CDATA[
+local users = _UserService.UserEntities
+if users == nil or users.Count == 0 then
+	return
+end
+local exitUsers = {}
+for k,v in pairs(users) do
+	table.insert(exitUsers,v.PlayerComponent.UserId)
+end
+_RoomService:MoveUsersToStaticRoom(exitUsers)
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="InitEventMatch" ExecSpace="All">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments />
+      <Code><![CDATA[
+local eventMatch = function()
+	self:SetMatchState(_MatchEnum.WAIT)
+	self:StartFinalReady(true)
+end
+_TimerService:SetTimerRepeat(eventMatch,self.eventMatchPeriod+self.waitingDuration,self.eventMatchPeriod)
+
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="OnEndPlay" ExecSpace="ServerOnly">
+      <Return Type="void" SyncDirection="None" />
+      <Code><![CDATA[
+_UserService:DisconnectEvent(UserEnterEvent,self._T.onUserEnterEvent)
+if self._T.timerId ~= nil and self._T.timerId > 0 then	
+	_TimerService:ClearTimer(self._T.timerId)
+	self._T.timerId = 0
+end
+]]></Code>
+    </CodeBlockMethod>
+  </Methods>
+  <EntityEventHandlers />
+</CodeBlockFile>

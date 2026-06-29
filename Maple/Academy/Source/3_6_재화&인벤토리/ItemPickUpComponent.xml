@@ -1,0 +1,46 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeBlockFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="bdc97dfd-244f-418c-a6c1-99dac45d15bb" Language="Lua" Name="ItemPickUpComponent" Type="Component" Source="None" ModifyTime="2026-06-01T19:54:49.4678561+09:00">
+  <CoreVersion Major="0" Minor="2" />
+  <ScriptVersion Major="1" Minor="1" />
+  <Description />
+  <Properties />
+  <Methods>
+    <CodeBlockMethod Name="equip" ExecSpace="Server">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments />
+      <Code><![CDATA[
+self.Entity.PlayerAttack.Damage = 50
+]]></Code>
+    </CodeBlockMethod>
+  </Methods>
+  <EntityEventHandlers>
+    <CodeBlockEntityEventHandler Name="HandleTriggerEnterEvent" EventName="TriggerEnterEvent" ParameterName="event" Target="self" Scope="All">
+      <Code><![CDATA[
+local TriggerBodyEntity = event.TriggerBodyEntity
+local itemRUID = TriggerBodyEntity.SpriteRendererComponent.SpriteRUID
+
+if itemRUID == "c30ea0b0b2384a69b9695c5344947a70" then
+	_ItemService:CreateItem(Weapon, "나뭇가지", self.Entity.InventoryComponent)
+elseif itemRUID == "4d18ebe3ec764bd38e376b6802c3df66" then
+	_ItemService:CreateItem(Weapon, "빛나는물약", self.Entity.InventoryComponent)
+end
+
+TriggerBodyEntity:Destroy(0)
+]]></Code>
+    </CodeBlockEntityEventHandler>
+    <CodeBlockEntityEventHandler Name="HandleEntityDestroyEvent" EventName="EntityDestroyEvent" ParameterName="event" Target="service:EntityService" Scope="All">
+      <Code><![CDATA[
+local Entity = event.Entity
+
+if isvalid(Entity.UIItemSlot) then
+	local itemName = Entity.UIItemSlot.item.Name
+	if itemName == "빛나는물약" then
+		self.Entity.PlayerComponent.Hp = self.Entity.PlayerComponent.Hp + 10
+	elseif itemName == "나뭇가지" then
+		self:equip()
+	end
+end
+]]></Code>
+    </CodeBlockEntityEventHandler>
+  </EntityEventHandlers>
+</CodeBlockFile>

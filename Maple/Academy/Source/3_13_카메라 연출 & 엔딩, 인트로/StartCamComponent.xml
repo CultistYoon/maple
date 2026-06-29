@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeBlockFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="ac640c9d-3d09-4213-8cd1-ba1d8014ddf7" Language="Lua" Name="StartCamComponent" Type="Component" Source="None" ModifyTime="2026-06-26T22:52:50.8871213+09:00">
+  <CoreVersion Major="0" Minor="2" />
+  <ScriptVersion Major="1" Minor="1" />
+  <Description />
+  <Properties />
+  <Methods />
+  <EntityEventHandlers>
+    <CodeBlockEntityEventHandler Name="HandleInteractionEvent" EventName="InteractionEvent" ParameterName="event" Target="self" Scope="All">
+      <Code><![CDATA[
+log("시작")
+local TriggerBodyEntity = event.InteractionEntity
+local map = _EntityService:GetEntityByPath("/maps/map01")
+
+--log(map)
+--log(map.SoundComponent)
+--log(map.SoundComponent.AudioClipRUID)
+
+map.SoundComponent.AudioClipRUID = "7d681eceb71d44f88a36b32422180d8c"
+map.SoundComponent:Play()
+
+local mapEntity = _EntityService:GetEntityByPath("/maps/map01/MapObject_8")
+_CameraService:SwitchCameraTo(mapEntity.CameraComponent)
+_CameraService.TransitionBlendTime = 3
+_CameraService.TransitionBlendType = CameraBlendType.EaseInOut
+_CameraService:ZoomTo(200, 15)
+
+local returnCamera = function()
+	_CameraService:SwitchCameraTo(TriggerBodyEntity.CameraComponent)
+	_CameraService.TransitionBlendTime = 1.5
+	_CameraService.TransitionBlendType = CameraBlendType.HardOut
+	_CameraService:ZoomReset()
+	
+	
+ 	--효과 바로 재생
+    --_EffectService:PlayEffectAttached("1dea1763a5fb4c5da2e06411183dbca8", self.Entity, Vector3(0, 1, 0), 0, Vector3(1, 1, 1), false)
+	
+    --사운드 원래대로 
+	map.SoundComponent.AudioClipRUID = "96caf11b323447fd829582091b364995"
+	map.SoundComponent:Play()
+end
+
+local startEffect = function()
+	_EffectService:PlayEffectAttached("1dea1763a5fb4c5da2e06411183dbca8", self.Entity, Vector3(0, 1, 0), 0, Vector3(1, 1, 1), false)
+end
+_TimerService:SetTimerOnce(returnCamera, 15)
+_TimerService:SetTimerOnce(startEffect, 18)
+
+]]></Code>
+    </CodeBlockEntityEventHandler>
+  </EntityEventHandlers>
+</CodeBlockFile>

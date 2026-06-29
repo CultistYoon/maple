@@ -1,0 +1,78 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeBlockFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="7e0fbaa7-a7ec-4278-a852-d77cb98d2917" Language="Lua" Name="Item" Type="Component" Source="None" ModifyTime="2026-06-04T13:37:12.3844988+09:00">
+  <CoreVersion Major="0" Minor="2" />
+  <ScriptVersion Major="1" Minor="1" />
+  <Description />
+  <Properties>
+    <CodeBlockProperty Name="ItemIndex" Type="number" DefaultValue="0" SyncDirection="All" />
+    <CodeBlockProperty Name="DropTweenTime" Type="number" DefaultValue="0" SyncDirection="All" />
+  </Properties>
+  <Methods>
+    <CodeBlockMethod Name="InitItem" ExecSpace="All">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments>
+        <CodeBlockProperty Name="itemIndex" Type="number" DefaultValue="0" SyncDirection="None" />
+      </Arguments>
+      <Code><![CDATA[
+self.ItemIndex = itemIndex
+
+    -- 드롭된 아이템이 어떤 모습으로 보일지 스프라이트 설정
+    local sprite = self.Entity.SpriteRendererComponent
+    local itemDataSet = _DataService:GetTable("UserItemDataSet")
+    local ruid = itemDataSet:GetRow(self.ItemIndex):GetItem("IconRUID")
+    sprite.SpriteRUID = ruid
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="OnBeginPlay" ExecSpace="All">
+      <Return Type="void" SyncDirection="None" />
+      <Code><![CDATA[
+if self:IsClient() then
+      	self:OnBeginPlayClient()
+    else
+    	self:OnBeginPlayServer()
+    end
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="OnBeginPlayClient" ExecSpace="All">
+      <Return Type="void" SyncDirection="None" />
+      <Code><![CDATA[
+-- Tween
+    local totalTweenTime = self.DropTweenTime
+    local jumpHeight = 1.1
+    -- 아이템 드롭될 때 jumpHeight 만큼 위로 한번 붕 뜨도록 함
+    local tween = _TweenLogic:MoveOffset(self.Entity, Vector2(0, jumpHeight), totalTweenTime / 2, EaseType.QuadEaseOut)
+    -- 올라간 만큼 내려오도록 함
+    tween:SetOnEndCallback(function() 
+    	local tween2 = _TweenLogic:MoveOffset(self.Entity, Vector2(0, -jumpHeight), totalTweenTime / 2, EaseType.QuadEaseIn) 
+    	tween2:SetOnEndCallback(function() self.Entity.TweenFloatingComponent.Enable = true end)
+    end)
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="OnBeginPlayServer" ExecSpace="All">
+      <Return Type="void" SyncDirection="None" />
+      <Code><![CDATA[
+-- Tween이 끝난 후에 TriggerComponent 활성화
+    _TimerService:SetTimerOnce(function() self.Entity.TriggerComponent.Enable = true end, self.DropTweenTime + 0.1) 
+]]></Code>
+    </CodeBlockMethod>
+  </Methods>
+  <EntityEventHandlers>
+    <CodeBlockEntityEventHandler Name="HandleTriggerEnterEvent" EventName="TriggerEnterEvent" ParameterName="event" Target="self" Scope="Server">
+      <Code><![CDATA[
+-- Parameters
+    local TriggerBodyEntity = event.TriggerBodyEntity
+    --------------------------------------------------------
+    --아이템 엔티티와 충돌한 엔티티의 인벤토리를 받고, 인벤토리가 없으면 리턴
+    local inventory = TriggerBodyEntity.LiteInventory
+    if inventory == nil then return end
+
+    -- 아이템 개수 변경 처리를 위해 ModifyItem() 함수 호출
+    inventory:ModifyItem(self.ItemIndex, 1)
+
+    -- 충돌한 아이템 엔티티는 파괴
+    self.Entity:Destroy()
+
+]]></Code>
+    </CodeBlockEntityEventHandler>
+  </EntityEventHandlers>
+</CodeBlockFile>

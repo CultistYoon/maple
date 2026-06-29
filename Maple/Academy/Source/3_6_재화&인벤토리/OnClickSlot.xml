@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeBlockFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="2893fd0e-0a45-4a8b-a020-ecdc9f9b3e3a" Language="Lua" Name="OnClickSlot" Type="Component" Source="None" ModifyTime="2026-05-30T23:20:01.8368652+09:00">
+  <CoreVersion Major="0" Minor="2" />
+  <ScriptVersion Major="1" Minor="1" />
+  <Description />
+  <Properties />
+  <Methods />
+  <EntityEventHandlers>
+    <CodeBlockEntityEventHandler Name="HandleButtonClickEvent" EventName="ButtonClickEvent" ParameterName="event" Target="self" Scope="All">
+      <Code><![CDATA[
+
+local Entity = event.Entity
+local itemName = Entity.UIItemSlot.item.Name
+
+if itemName == "나뭇가지" then
+    _UserService.LocalPlayer.CostumeManagerComponent.CustomOneHandedWeaponEquip = "aaa06888cfc24381aea4719918115a46"
+end
+
+self.Entity:Destroy()
+
+
+]]></Code>
+    </CodeBlockEntityEventHandler>
+  </EntityEventHandlers>
+</CodeBlockFile>

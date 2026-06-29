@@ -1,0 +1,25 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeBlockFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="87e4be93-94d0-4326-8904-1eb15e7a5d6e" Language="Lua" Name="AutoToggleButtonComponent" Type="Component" Source="None" ModifyTime="2026-05-09T10:34:59.2010412+09:00">
+  <CoreVersion Major="0" Minor="2" />
+  <ScriptVersion Major="1" Minor="1" />
+  <Description />
+  <Properties />
+  <Methods />
+  <EntityEventHandlers>
+    <CodeBlockEntityEventHandler Name="HandleButtonClickEvent" EventName="ButtonClickEvent" ParameterName="event" Target="self" Scope="All">
+      <Code><![CDATA[
+local player = _UserService.LocalPlayer
+log(player)
+local playerComp = player.PlayerAutoComponent
+        
+if playerComp ~= nil then
+	playerComp:ToggleAutoMove()
+	
+else
+	
+end
+
+]]></Code>
+    </CodeBlockEntityEventHandler>
+  </EntityEventHandlers>
+</CodeBlockFile>

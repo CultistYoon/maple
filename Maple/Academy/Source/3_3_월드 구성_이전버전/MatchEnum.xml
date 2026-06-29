@@ -1,0 +1,31 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeBlockFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="92e2c2b9-e1e2-4b60-80ad-c9aa52ca28f2" Language="Lua" Name="MatchEnum" Type="Logic" Source="None" ModifyTime="2022-02-21T12:58:58.2580582+09:00">
+  <CoreVersion Major="0" Minor="2" />
+  <ScriptVersion Major="1" Minor="0" />
+  <Description />
+  <Properties>
+    <CodeBlockProperty Name="NONE" Type="number" DefaultValue="0--매칭 중이 아닙니다" SyncDirection="None" />
+    <CodeBlockProperty Name="WAIT" Type="number" DefaultValue="1--매칭 대기 중 입니다" SyncDirection="None" />
+    <CodeBlockProperty Name="FINAL_READY" Type="number" DefaultValue="2--매칭되어 최종 대기 중입니다" SyncDirection="None" />
+  </Properties>
+  <Methods>
+    <CodeBlockMethod Name="ToString" ExecSpace="All">
+      <Return Type="string" DefaultValue="&quot;&quot;" SyncDirection="None" />
+      <Arguments>
+        <CodeBlockProperty Name="state" Type="number" DefaultValue="0" SyncDirection="None" />
+      </Arguments>
+      <Code><![CDATA[
+if state == self.NONE then
+	return "NONE"
+end
+if state == self.WAIT then
+	return "WAIT"
+end
+if state == self.FINAL_READY then
+	return "FINAL_READY"
+end
+]]></Code>
+    </CodeBlockMethod>
+  </Methods>
+  <EntityEventHandlers />
+</CodeBlockFile>

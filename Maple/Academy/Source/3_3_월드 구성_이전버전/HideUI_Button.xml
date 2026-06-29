@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeBlockFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="642f26fb-0914-423b-b80d-1347db908f9f" Language="Lua" Name="HideUI_Button" Type="Component" Source="None" ModifyTime="2026-04-19T20:57:13.1184502+09:00">
+  <CoreVersion Major="0" Minor="2" />
+  <ScriptVersion Major="1" Minor="1" />
+  <Description />
+  <Properties />
+  <Methods>
+    <CodeBlockMethod Name="OnBeginPlay" ExecSpace="ClientOnly">
+      <Return Type="void" SyncDirection="None" />
+      <Code><![CDATA[
+
+-- 시작 시 현재 맵 이름을 확인합니다.
+local currentMapName = _UserService.LocalPlayer.CurrentMapName
+        
+log(currentMapName)
+-- 인스턴스 맵이 아닌 일반 맵일 때만 UIGroup을 숨깁니다.
+if currentMapName == "DungeonMap" then
+	local UI_Button = _EntityService:GetEntityByPath("/ui/DefaultGroup/Btn_Go")
+
+	if UI_Button ~= nil then
+		UI_Button.Visible = false
+	end
+end
+
+]]></Code>
+    </CodeBlockMethod>
+  </Methods>
+  <EntityEventHandlers />
+</CodeBlockFile>

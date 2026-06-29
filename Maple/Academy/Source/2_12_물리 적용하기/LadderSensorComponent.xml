@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeBlockFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="ee53edba-9d6e-46fb-8ac8-135413c687e5" Language="Lua" Name="LadderSensorComponent" Type="Component" Source="None" ModifyTime="2023-07-25T10:21:04.192531+09:00">
+  <CoreVersion Major="0" Minor="2" />
+  <ScriptVersion Major="1" Minor="0" />
+  <Description />
+  <Properties>
+    <CodeBlockProperty Name="Owner" Type="Entity" DefaultValue="nil" SyncDirection="All">
+      <Attributes xsi:type="HideFromInspectorScriptAttribute" />
+    </CodeBlockProperty>
+    <CodeBlockProperty Name="SensorType" Type="string" DefaultValue="&quot;&quot;" SyncDirection="All">
+      <Attributes xsi:type="HideFromInspectorScriptAttribute" />
+    </CodeBlockProperty>
+  </Properties>
+  <Methods />
+  <EntityEventHandlers>
+    <CodeBlockEntityEventHandler Name="HandleTriggerEnterEvent" EventName="TriggerEnterEvent" ParameterName="event" Target="self" Scope="Server">
+      <Code><![CDATA[
+-- ===============================================
+-- 사다리 판정 트리거입니다.
+-- ===============================================
+local TriggerBodyEntity = event.TriggerBodyEntity
+
+if not isvalid(TriggerBodyEntity) then return end
+if not isvalid(TriggerBodyEntity.PhysicsLadderComponent) then return end
+
+if self.SensorType == "Top" then
+	self.Owner.PhysicsPlayerMoveComponent.IsTopLadderTouching = true	
+elseif self.SensorType == "Bottom" then
+	self.Owner.PhysicsPlayerMoveComponent.IsBottomLadderTouching = true	
+end
+
+self.Owner.PhysicsPlayerMoveComponent:InteractWithLadder(self.Entity, TriggerBodyEntity)
+
+]]></Code>
+    </CodeBlockEntityEventHandler>
+    <CodeBlockEntityEventHandler Name="HandleTriggerLeaveEvent" EventName="TriggerLeaveEvent" ParameterName="event" Target="self" Scope="Server">
+      <Code><![CDATA[
+-- ===============================================
+-- 사다리 판정 트리거입니다.
+-- ===============================================
+local TriggerBodyEntity = event.TriggerBodyEntity
+
+if not isvalid(TriggerBodyEntity) then return end
+if not isvalid(TriggerBodyEntity.PhysicsLadderComponent) then return end
+
+local PlayerPhysicsMove = self.Owner.PhysicsPlayerMoveComponent
+
+if self.SensorType == "Top" then
+	PlayerPhysicsMove.IsTopLadderTouching = false	
+	
+elseif self.SensorType == "Bottom" then
+	PlayerPhysicsMove.IsBottomLadderTouching = false
+end
+
+if isvalid(PlayerPhysicsMove.LadderEntity) then
+	if not PlayerPhysicsMove.IsTopLadderTouching and not PlayerPhysicsMove.IsBottomLadderTouching then
+		PlayerPhysicsMove:DownOnLadder(nil)
+	end
+else
+	PlayerPhysicsMove.ClimbableLadderEntity = nil
+end
+]]></Code>
+    </CodeBlockEntityEventHandler>
+  </EntityEventHandlers>
+</CodeBlockFile>

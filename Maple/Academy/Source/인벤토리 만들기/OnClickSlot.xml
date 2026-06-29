@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeBlockFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="17d2cc26-0078-41ee-8016-40a70edde548" Language="Lua" Name="OnClickSlot" Type="Component" Source="None" ModifyTime="2026-05-06T14:00:55.0354284+09:00">
+  <CoreVersion Major="0" Minor="2" />
+  <ScriptVersion Major="1" Minor="1" />
+  <Description />
+  <Properties />
+  <Methods />
+  <EntityEventHandlers>
+    <CodeBlockEntityEventHandler Name="HandleButtonClickEvent" EventName="ButtonClickEvent" ParameterName="event" Target="self" Scope="All">
+      <Code><![CDATA[
+--------------- Native Event Sender Info ----------------
+-- Sender: ButtonComponent
+-- Space: Client
+---------------------------------------------------------
+
+-- Parameters
+local Entity = event.Entity
+self.Entity:Destroy()
+_UserService.LocalPlayer.CostumeManagerComponent.CustomOneHandedWeaponEquip = "3bf2ed885528458fbc175e40d2e09208"
+]]></Code>
+    </CodeBlockEntityEventHandler>
+  </EntityEventHandlers>
+</CodeBlockFile>

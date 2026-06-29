@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeBlockFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="9abb5a08-75fe-4074-9e9c-6f370e024af7" Language="Lua" Name="ItemPickUpComponent" Type="Component" Source="None" ModifyTime="2026-05-06T14:01:24.8981137+09:00">
+  <CoreVersion Major="0" Minor="2" />
+  <ScriptVersion Major="1" Minor="1" />
+  <Description />
+  <Properties />
+  <Methods>
+    <CodeBlockMethod Name="equip" ExecSpace="Server">
+      <Return Type="void" SyncDirection="None" />
+      <Code><![CDATA[
+self.Entity.PlayerAttack.Damage = 33
+]]></Code>
+    </CodeBlockMethod>
+  </Methods>
+  <EntityEventHandlers>
+    <CodeBlockEntityEventHandler Name="HandleTriggerEnterEvent" EventName="TriggerEnterEvent" ParameterName="event" Target="self" Scope="All">
+      <Code><![CDATA[
+--------------- Native Event Sender Info ----------------
+-- Sender: TriggerComponent
+-- Space: Server, Client
+---------------------------------------------------------
+
+-- Parameters
+local TriggerBodyEntity = event.TriggerBodyEntity
+TriggerBodyEntity:Destroy()
+
+_ItemService:CreateItem(Weapon, "나뭇가지", self.Entity.InventoryComponent)
+
+]]></Code>
+    </CodeBlockEntityEventHandler>
+    <CodeBlockEntityEventHandler Name="HandleEntityDestroyEvent" EventName="EntityDestroyEvent" ParameterName="event" Target="service:EntityService" Scope="All">
+      <Code><![CDATA[
+local Entity = event.Entity
+if isvalid(Entity.UIItemSlot) then
+	self:equip()
+end
+
+]]></Code>
+    </CodeBlockEntityEventHandler>
+  </EntityEventHandlers>
+</CodeBlockFile>

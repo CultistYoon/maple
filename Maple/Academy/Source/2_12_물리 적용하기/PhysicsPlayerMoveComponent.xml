@@ -1,0 +1,610 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeBlockFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="52593db8-f15e-4d83-b27e-86f3774a4fe9" Language="Lua" Name="PhysicsPlayerMoveComponent" Type="Component" Source="None" ModifyTime="2023-08-01T10:53:21.791283+09:00">
+  <CoreVersion Major="0" Minor="2" />
+  <ScriptVersion Major="1" Minor="0" />
+  <Description />
+  <Properties>
+    <CodeBlockProperty Name="Model_LadderPoint" Type="string" DefaultValue="&quot;4d76cfc9-6fb1-4983-89d6-85bab597e8b4&quot;" SyncDirection="All">
+      <Attributes xsi:type="HideFromInspectorScriptAttribute" />
+    </CodeBlockProperty>
+    <CodeBlockProperty Name="WalkSpeed" Type="number" DefaultValue="2" SyncDirection="All">
+      <Attributes xsi:type="DescScriptAttribute" Value="플레이어의 걷는 속도입니다." />
+    </CodeBlockProperty>
+    <CodeBlockProperty Name="JumpSpeed" Type="number" DefaultValue="8" SyncDirection="All">
+      <Attributes xsi:type="DescScriptAttribute" Value="플레이어의 점프력입니다." />
+    </CodeBlockProperty>
+    <CodeBlockProperty Name="ClimbSpeed" Type="number" DefaultValue="1.7" SyncDirection="All">
+      <Attributes xsi:type="DescScriptAttribute" Value="플레이어의 사다리를 오르는 속도입니다." />
+    </CodeBlockProperty>
+    <CodeBlockProperty Name="PVPMode" Type="boolean" DefaultValue="true" SyncDirection="None">
+      <Attributes xsi:type="DescScriptAttribute" Value="활성화 시, 다른 플레이어와 물리 충돌이 가능해집니다." />
+    </CodeBlockProperty>
+    <CodeBlockProperty Name="CurAnim" Type="string" DefaultValue="&quot;IDLE&quot;" SyncDirection="All">
+      <Attributes xsi:type="HideFromInspectorScriptAttribute" />
+    </CodeBlockProperty>
+    <CodeBlockProperty Name="PrevAnim" Type="string" DefaultValue="&quot;&quot;" SyncDirection="None">
+      <Attributes xsi:type="HideFromInspectorScriptAttribute" />
+    </CodeBlockProperty>
+    <CodeBlockProperty Name="Vertical" Type="number" DefaultValue="0" SyncDirection="None">
+      <Attributes xsi:type="HideFromInspectorScriptAttribute" />
+    </CodeBlockProperty>
+    <CodeBlockProperty Name="Horizontal" Type="number" DefaultValue="0" SyncDirection="None">
+      <Attributes xsi:type="HideFromInspectorScriptAttribute" />
+    </CodeBlockProperty>
+    <CodeBlockProperty Name="JumpTimer" Type="number" DefaultValue="0" SyncDirection="None">
+      <Attributes xsi:type="HideFromInspectorScriptAttribute" />
+    </CodeBlockProperty>
+    <CodeBlockProperty Name="JumpTimerMax" Type="number" DefaultValue="0.3" SyncDirection="None">
+      <Attributes xsi:type="HideFromInspectorScriptAttribute" />
+    </CodeBlockProperty>
+    <CodeBlockProperty Name="JumpDirectionPower" Type="number" DefaultValue="0" SyncDirection="None">
+      <Attributes xsi:type="HideFromInspectorScriptAttribute" />
+    </CodeBlockProperty>
+    <CodeBlockProperty Name="CanJump" Type="boolean" DefaultValue="false" SyncDirection="None">
+      <Attributes xsi:type="HideFromInspectorScriptAttribute" />
+    </CodeBlockProperty>
+    <CodeBlockProperty Name="IsSitting" Type="boolean" DefaultValue="false" SyncDirection="None">
+      <Attributes xsi:type="HideFromInspectorScriptAttribute" />
+    </CodeBlockProperty>
+    <CodeBlockProperty Name="IsJumping" Type="boolean" DefaultValue="false" SyncDirection="None">
+      <Attributes xsi:type="HideFromInspectorScriptAttribute" />
+    </CodeBlockProperty>
+    <CodeBlockProperty Name="IsJumpingFromLadder" Type="boolean" DefaultValue="false" SyncDirection="All">
+      <Attributes xsi:type="HideFromInspectorScriptAttribute" />
+    </CodeBlockProperty>
+    <CodeBlockProperty Name="IsLeftPressing" Type="boolean" DefaultValue="false" SyncDirection="None">
+      <Attributes xsi:type="HideFromInspectorScriptAttribute" />
+    </CodeBlockProperty>
+    <CodeBlockProperty Name="IsRightPressing" Type="boolean" DefaultValue="false" SyncDirection="None">
+      <Attributes xsi:type="HideFromInspectorScriptAttribute" />
+    </CodeBlockProperty>
+    <CodeBlockProperty Name="IsUpPressing" Type="boolean" DefaultValue="false" SyncDirection="None">
+      <Attributes xsi:type="HideFromInspectorScriptAttribute" />
+    </CodeBlockProperty>
+    <CodeBlockProperty Name="IsDownPressing" Type="boolean" DefaultValue="false" SyncDirection="None">
+      <Attributes xsi:type="HideFromInspectorScriptAttribute" />
+    </CodeBlockProperty>
+    <CodeBlockProperty Name="IsTopLadderTouching" Type="boolean" DefaultValue="false" SyncDirection="All">
+      <Attributes xsi:type="HideFromInspectorScriptAttribute" />
+    </CodeBlockProperty>
+    <CodeBlockProperty Name="IsBottomLadderTouching" Type="boolean" DefaultValue="false" SyncDirection="All">
+      <Attributes xsi:type="HideFromInspectorScriptAttribute" />
+    </CodeBlockProperty>
+    <CodeBlockProperty Name="LadderEntity" Type="Entity" DefaultValue="nil" SyncDirection="All">
+      <Attributes xsi:type="HideFromInspectorScriptAttribute" />
+    </CodeBlockProperty>
+    <CodeBlockProperty Name="ClimbableLadderEntity" Type="Entity" DefaultValue="nil" SyncDirection="All">
+      <Attributes xsi:type="HideFromInspectorScriptAttribute" />
+    </CodeBlockProperty>
+    <CodeBlockProperty Name="TopLadderSensorEntity" Type="Entity" DefaultValue="nil" SyncDirection="None">
+      <Attributes xsi:type="HideFromInspectorScriptAttribute" />
+    </CodeBlockProperty>
+    <CodeBlockProperty Name="BottomLadderSensorEntity" Type="Entity" DefaultValue="nil" SyncDirection="None">
+      <Attributes xsi:type="HideFromInspectorScriptAttribute" />
+    </CodeBlockProperty>
+    <CodeBlockProperty Name="PhysicsRigidComponent" Type="Component" DefaultValue=":PhysicsRigidbodyComponent" SyncDirection="All">
+      <Attributes xsi:type="HideFromInspectorScriptAttribute" />
+    </CodeBlockProperty>
+    <CodeBlockProperty Name="HitZone" Type="Entity" DefaultValue="nil" SyncDirection="None">
+      <Attributes xsi:type="HideFromInspectorScriptAttribute" />
+    </CodeBlockProperty>
+  </Properties>
+  <Methods>
+    <CodeBlockMethod Name="OnBeginPlay" ExecSpace="ServerOnly">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments />
+      <Code><![CDATA[
+self.PhysicsRigidComponent = self.Entity.PhysicsRigidbodyComponent
+self.PhysicsRigidComponent:SetClientAsPhysicsOwner(self.Entity.PlayerComponent.UserId)
+
+
+-- 캐릭터 머리 위에 사다리 판정 포인트를 스폰합니다. --
+local topOffset = 0.35
+local topPointEntity = _SpawnService:SpawnByModelId(self.Model_LadderPoint, "LadderPoint_Up", Vector3(0, topOffset, 0), self.Entity)
+topPointEntity.LadderSensorComponent.Owner = self.Entity
+topPointEntity.LadderSensorComponent.SensorType = "Top"
+self.TopLadderSensorEntity = topPointEntity
+
+-- 캐릭터 발 아래에 사다리 판정 포인트를 스폰합니다. --
+local bottomOffset = -0.35
+local bottomPointEntity = _SpawnService:SpawnByModelId(self.Model_LadderPoint, "LadderPoint_Down", Vector3(0, bottomOffset, 0), self.Entity)
+bottomPointEntity.LadderSensorComponent.Owner = self.Entity
+bottomPointEntity.LadderSensorComponent.SensorType = "Bottom"
+self.BottomLadderSensorEntity = bottomPointEntity
+
+self.HitZone = _SpawnService:SpawnByModelId("model://9ad9a4ce-6f25-47cb-9d1d-31681e1ce828", "HitZone", Vector3(0,0,0), self.Entity)
+self.HitZone.DistanceJointComponent:AddJoint(self.Entity, Vector2(0,0), Vector2(0,0), 0)
+
+-- PVP 모드를 활성화합니다. ---------------------------
+if not self.PVPMode then
+	self.HitZone.PhysicsColliderComponent.CollisionGroup = CollisionGroups.PlayerNonPVP
+	self.Entity.PhysicsColliderComponent.CollisionGroup = CollisionGroups.PlayerNonPVP
+end
+
+-- 점프 착지 판정 포인트를 스폰합니다. ----------------
+_SpawnService:SpawnByModelId("model://fae73aa3-58c1-4986-bbb7-6e68f5d022e7", "BoundSensor", Vector3(0, bottomOffset, 0), self.Entity)
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="OnUpdate" ExecSpace="ClientOnly">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments>
+        <CodeBlockProperty Name="delta" Type="number" SyncDirection="None" />
+      </Arguments>
+      <Code><![CDATA[
+if self.Entity ~= _UserService.LocalPlayer then
+	return
+end
+
+if not self.CanJump then
+	self.JumpTimer += delta
+	if self.JumpTimer >= self.JumpTimerMax then
+		self.JumpTimer = 0
+		self.CanJump = true
+	end
+end
+
+-- 타일 위 이동 -------------------------
+local canGroundMove = self:CanGroundMove()
+
+if self.IsLeftPressing then self.Horizontal = -1
+elseif self.IsRightPressing then self.Horizontal = 1
+elseif not self.IsLeftPressing and not self.IsRightPressing then self.Horizontal = 0 end
+	
+if canGroundMove and math.abs(self.Horizontal) > 0 then
+	self:MoveOnGround(self.Horizontal, self.JumpDirectionPower, self.IsJumping)
+end
+	
+-- 사다리 이동 --------------------------
+if self.IsUpPressing then self.Vertical = 1
+elseif self.IsDownPressing then self.Vertical = -1
+elseif not self.IsUpPressing and not self.IsDownPressing then self.Vertical = 0 end
+	
+if isvalid(self.LadderEntity) then
+	self:MoveOnLadder(self.Vertical)
+end
+
+-- 애님 변경 -----------------------------
+local isFalling = (math.abs(self.PhysicsRigidComponent:GetLinearVelocity().y) > self.WalkSpeed and self.CurAnim ~= "LADDER")
+
+if self.IsJumping then
+	if isvalid(self.LadderEntity) then 
+		self:RequestAnimChange("LADDER")
+	else 
+		self:RequestAnimChange("JUMP")
+	end
+elseif isFalling then
+	self:RequestAnimChange("FALL")
+elseif isvalid(self.LadderEntity) then
+	self:RequestAnimChange("LADDER")
+elseif self.Horizontal == 0 and self.Vertical < 0 then
+	self:RequestAnimChange("CROUCH")
+elseif math.abs(self.Horizontal) > 0 then
+	self:RequestAnimChange("MOVE")		
+elseif self.IsSitting then
+	self:RequestAnimChange("SIT")
+else
+	self:RequestAnimChange("IDLE")
+end
+
+if self.IsJumping then
+	self:CheckJumpErrorStatus(delta)
+end
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="Jump" ExecSpace="Server">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments />
+      <Code><![CDATA[
+-- =========================================
+-- 타일 위에서 점프합니다.
+-- =========================================
+if self.PhysicsRigidComponent:GetLinearVelocity().y < -5 then
+	return
+end
+
+self.PhysicsRigidComponent:ApplyLinearImpulse(Vector2(0, self.JumpSpeed * 100))
+
+_SoundService:PlaySound("d881a73a0700404a91bcf753474274c3", 1, self.Entity.PlayerComponent.UserId)
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="MoveOnGround" ExecSpace="Server">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments>
+        <CodeBlockProperty Name="horizontal" Type="number" SyncDirection="None" />
+        <CodeBlockProperty Name="jumpDirection" Type="number" DefaultValue="0" SyncDirection="None" />
+        <CodeBlockProperty Name="isJumping" Type="boolean" SyncDirection="None" />
+      </Arguments>
+      <Code><![CDATA[
+-- =========================================
+-- 타일 위에서 플레이어를 움직입니다.
+-- =========================================
+self.Entity.PlayerControllerComponent.LookDirectionX = horizontal
+
+if horizontal ~= jumpDirection and isJumping then 
+	self.PhysicsRigidComponent:ApplyLinearImpulse(Vector2((horizontal) * self.WalkSpeed * 2, 0))
+else
+	self.PhysicsRigidComponent:SetLinearVelocityX(horizontal * self.WalkSpeed)
+end
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="MoveOnLadder" ExecSpace="Server">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments>
+        <CodeBlockProperty Name="vertical" Type="number" SyncDirection="None" />
+      </Arguments>
+      <Code><![CDATA[
+-- =========================================
+-- 사다리를 오릅니다.
+-- =========================================
+if not isvalid(self.LadderEntity) then
+	return
+end
+
+if self.Entity.TransformComponent.WorldPosition.x ~= self.LadderEntity.TransformComponent.WorldPosition.x then
+	self.PhysicsRigidComponent:SetPosition(Vector2(self.LadderEntity.TransformComponent.WorldPosition.x, self.Entity.TransformComponent.WorldPosition.y))
+end
+
+-- ------------------------------------------------------------------------------
+-- 사다리 포인트 판정 범위를 변경합니다.
+-- ------------------------------------------------------------------------------
+if vertical < 0 then
+	self.TopLadderSensorEntity.TransformComponent.Position.y = -0.2
+	self.BottomLadderSensorEntity.TransformComponent.Position.y = -0.35
+else
+	self.TopLadderSensorEntity.TransformComponent.Position.y = 0.35
+	self.BottomLadderSensorEntity.TransformComponent.Position.y = -0.2
+end
+
+self.PhysicsRigidComponent:SetLinearVelocity(Vector2(0, (self.ClimbSpeed * vertical)))
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="LandOnGround" ExecSpace="Client">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments />
+      <Code><![CDATA[
+-- =========================================
+-- 착지합니다.
+-- =========================================
+if not self.IsJumping then
+	return
+end
+
+self.IsJumping = false
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="UpOnLadder" ExecSpace="Server">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments />
+      <Code><![CDATA[
+-- =========================================
+-- 사다리를 탑니다.
+-- =========================================
+if not isvalid(self.ClimbableLadderEntity) then
+	return
+end
+
+if isvalid(self.LadderEntity) then
+	return
+end
+
+self.Entity.PhysicsColliderComponent.IsSensor = true
+self.Entity.PhysicsRigidbodyComponent.GravityScale = 0
+
+self.HitZone.PhysicsRigidbodyComponent.Enable = false
+self.HitZone.PhysicsColliderComponent.Enable = false
+self.Entity.PhysicsRigidbodyComponent:SetLinearVelocity(Vector2(0,0))
+
+self.LadderEntity = self.ClimbableLadderEntity
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="DownOnLadder" ExecSpace="Server">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments>
+        <CodeBlockProperty Name="horizontal" Type="number" SyncDirection="None" />
+      </Arguments>
+      <Code><![CDATA[
+-- =========================================
+-- 사다리에서 떨어집니다.
+-- =========================================
+self.Entity.PhysicsColliderComponent.IsSensor = false
+
+self.HitZone.PhysicsRigidbodyComponent.Enable = true
+self.HitZone.PhysicsColliderComponent.Enable = true
+
+self.Entity.PhysicsRigidbodyComponent.GravityScale = 2.4
+
+self.LadderEntity = nil
+self.ClimbableLadderEntity = nil
+
+if isvalid(horizontal) then
+	local xPower = 200
+	local yPower = 350
+		
+	if horizontal ~= 0 then
+		local jumpFunction = function() 
+			self.Entity.PhysicsRigidbodyComponent:SetLinearVelocity(Vector2(0,0))
+			self.Entity.PhysicsRigidbodyComponent:ApplyLinearImpulse(Vector2(horizontal * xPower, yPower))
+			_SoundService:PlaySound("d881a73a0700404a91bcf753474274c3", 1, self.Entity.PlayerComponent.UserId)
+		end
+		_TimerService:SetTimerOnce(jumpFunction, 0.05)
+	end
+end
+
+self.TopLadderSensorEntity.TransformComponent.Position.y = 0.35
+self.BottomLadderSensorEntity.TransformComponent.Position.y = -0.35
+
+self.IsJumpingFromLadder = true
+
+
+_TimerService:SetTimerOnce(function() self.IsJumpingFromLadder = false end, 0.5)
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="InteractWithLadder" ExecSpace="ServerOnly">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments>
+        <CodeBlockProperty Name="triggerEntity" Type="Entity" SyncDirection="None" />
+        <CodeBlockProperty Name="ladderEntity" Type="Entity" SyncDirection="None" />
+      </Arguments>
+      <Code><![CDATA[
+-- ===================================================
+-- 사다리와 상호작용합니다.
+-- ===================================================
+if isvalid(self.ClimbableLadderEntity) then
+	return
+end
+
+self.ClimbableLadderEntity = ladderEntity
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="SyncAnim" ExecSpace="Client">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments>
+        <CodeBlockProperty Name="nextAnim" Type="string" SyncDirection="None" />
+      </Arguments>
+      <Code><![CDATA[
+-- ===================================================
+-- 플레이어의 애님을 변경합니다.
+-- ===================================================
+local bodyAnim = BodyActionStateChangeEvent()
+bodyAnim.needResetAction = true
+
+if not isvalid(self.Entity.AvatarRendererComponent:GetBodyEntity()) then
+	return
+end
+
+local curAnim = self.Entity.AvatarRendererComponent:GetBodyEntity().AvatarBodyActionSelectorComponent.ActionState
+
+if nextAnim == "IDLE" then
+	bodyAnim.ActionState = MapleAvatarBodyActionState.Stand
+elseif nextAnim == "MOVE" then
+	bodyAnim.ActionState = MapleAvatarBodyActionState.Walk
+elseif nextAnim == "JUMP" or nextAnim == "FALL" then
+	bodyAnim.ActionState = MapleAvatarBodyActionState.Fall
+elseif nextAnim == "LADDER" then
+	bodyAnim.ActionState = MapleAvatarBodyActionState.Ladder
+elseif nextAnim == "CROUCH" then
+	bodyAnim.ActionState = MapleAvatarBodyActionState.Crouch
+elseif nextAnim == "SIT" then
+	bodyAnim.ActionState = MapleAvatarBodyActionState.Sit
+end
+
+self.Entity:SendEvent(bodyAnim)
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="SetPlayerAnim" ExecSpace="Server">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments>
+        <CodeBlockProperty Name="nextAnim" Type="string" SyncDirection="None" />
+      </Arguments>
+      <Code><![CDATA[
+-- ===================================================
+-- 플레이어의 애님을 변경합니다.
+-- ===================================================
+self.CurAnim = nextAnim
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="RequestAnimChange" ExecSpace="ClientOnly">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments>
+        <CodeBlockProperty Name="nextAnim" Type="string" DefaultValue="&quot;&quot;" SyncDirection="None" />
+      </Arguments>
+      <Code><![CDATA[
+-- ===================================================
+-- 플레이어의 애님 변경을 요청합니다.
+-- ===================================================
+local canChangeAnim = (self.PrevAnim ~= nextAnim)
+if canChangeAnim then
+	self:SetPlayerAnim(nextAnim)
+	self.PrevAnim = nextAnim
+end
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="CanGroundMove" ExecSpace="ClientOnly">
+      <Return Type="boolean" DefaultValue="false" SyncDirection="None" />
+      <Code><![CDATA[
+-- ===================================================
+-- 좌 / 우 이동이 가능한지 체크합니다.
+-- ===================================================
+local canGroundMove = false
+
+if self.CurAnim == "MOVE" then canGroundMove = true
+elseif self.CurAnim == "JUMP" then canGroundMove = true
+elseif self.CurAnim == "FALL" then canGroundMove = true
+elseif self.CurAnim == "IDLE" then canGroundMove = true
+elseif self.CurAnim == "SIT" then canGroundMove = true end
+
+return canGroundMove
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="OnSyncProperty" ExecSpace="ClientOnly">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments>
+        <CodeBlockProperty Name="name" Type="string" SyncDirection="None" />
+        <CodeBlockProperty Name="value" Type="any" SyncDirection="None" />
+      </Arguments>
+      <Code><![CDATA[
+-- ===================================================
+-- 플레이어의 애님을 다른 클라에게 동기화합니다.
+-- ===================================================
+local player = _UserService.LocalPlayer
+	
+if name == "CurAnim" then
+	self:SyncAnim(value)
+end
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="CheckJumpErrorStatus" ExecSpace="ClientOnly">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments>
+        <CodeBlockProperty Name="delta" Type="number" DefaultValue="0" SyncDirection="None" />
+      </Arguments>
+      <Code><![CDATA[
+local velocityY = self.Entity.PhysicsRigidbodyComponent:GetLinearVelocity().y
+local isError = (math.abs(velocityY) < 1)
+
+if not isvalid(self._T.JumpErrorTimer) then self._T.JumpErrorTimer = 0 end
+
+if isError then self._T.JumpErrorTimer += delta else self._T.JumpErrorTimer = 0 end
+
+if self._T.JumpErrorTimer >= 0.15 then
+	self._T.JumpErrorTimer = 0
+	self.IsJumping = false
+end
+]]></Code>
+    </CodeBlockMethod>
+  </Methods>
+  <EntityEventHandlers>
+    <CodeBlockEntityEventHandler Name="HandleKeyUpEvent" EventName="KeyUpEvent" ParameterName="event" Target="service:InputService" Scope="Client">
+      <Code><![CDATA[
+-- ===================================================
+-- 캐릭터 조작 관련 코드입니다.
+-- ===================================================
+
+local player = _UserService.LocalPlayer
+
+if player ~= self.Entity then
+	return
+end
+
+local key = event.key
+if key == KeyboardKey.LeftArrow or key == KeyboardKey.A then
+	self.IsLeftPressing = false
+	
+elseif key == KeyboardKey.RightArrow or key == KeyboardKey.D then
+	self.IsRightPressing = false
+	
+elseif key == KeyboardKey.UpArrow or key == KeyboardKey.W then
+	self.IsUpPressing = false
+	
+elseif key == KeyboardKey.DownArrow or key == KeyboardKey.S then
+	self.IsDownPressing = false
+	
+elseif key == KeyboardKey.C then
+	if self.CurAnim == "IDLE" then
+		self.IsSitting = true
+	end
+end
+]]></Code>
+    </CodeBlockEntityEventHandler>
+    <CodeBlockEntityEventHandler Name="HandleKeyDownEvent" EventName="KeyDownEvent" ParameterName="event" Target="service:InputService" Scope="Client">
+      <Code><![CDATA[
+-- ===================================================
+-- 캐릭터 조작 관련 코드입니다.
+-- ===================================================
+local player = _UserService.LocalPlayer
+
+if player ~= self.Entity then
+	return
+end
+
+local key = event.key
+
+if key == KeyboardKey.LeftArrow or key == KeyboardKey.A then
+	self.IsLeftPressing = true
+	self.IsSitting = false
+	
+elseif key == KeyboardKey.RightArrow or key == KeyboardKey.D then
+	self.IsRightPressing = true
+	self.IsSitting = false
+	
+elseif key == KeyboardKey.UpArrow or key == KeyboardKey.W then
+	self.IsUpPressing = true
+
+elseif key == KeyboardKey.DownArrow or key == KeyboardKey.S then
+	self.IsSitting = false
+	self.IsDownPressing = true
+	
+elseif key == KeyboardKey.Space or key == KeyboardKey.LeftAlt then
+	self.IsSitting = false
+	if not self.CanJump then
+		return
+	end
+	if self.CurAnim == "LADDER" then
+		if isvalid(self.LadderEntity) and self.IsBottomLadderTouching and self.IsTopLadderTouching and self.Horizontal ~= 0 then
+			self:DownOnLadder(self.Horizontal)
+			self.JumpDirectionPower = self.Horizontal
+			self.IsJumping = true
+		end
+	else
+		if not self.IsJumping then
+				self:Jump()
+				self.JumpDirectionPower = self.Horizontal
+				self.IsJumping = true
+		end
+	end
+	self.CanJump = false
+end
+
+]]></Code>
+    </CodeBlockEntityEventHandler>
+    <CodeBlockEntityEventHandler Name="HandleKeyHoldEvent" EventName="KeyHoldEvent" ParameterName="event" Target="service:InputService" Scope="Client">
+      <Code><![CDATA[
+-- ===================================================
+-- 사다리 조작 관련 코드입니다.
+-- ===================================================
+local player = _UserService.LocalPlayer
+
+if self.IsJumpingFromLadder then
+	return
+end
+
+if player ~= self.Entity then
+	return
+end
+
+local key = event.key
+
+if key == KeyboardKey.UpArrow or key == KeyboardKey.W then
+	if isvalid(self.ClimbableLadderEntity) and not isvalid(self.LadderEntity) then
+		if self.IsTopLadderTouching and not self.IsBottomLadderTouching then
+			self:UpOnLadder()
+			
+		elseif self.IsTopLadderTouching and self.IsBottomLadderTouching then
+			self:UpOnLadder()
+		end
+	end
+
+elseif key == KeyboardKey.DownArrow or key == KeyboardKey.S then
+	if isvalid(self.ClimbableLadderEntity) and not isvalid(self.LadderEntity) then
+		if not self.IsTopLadderTouching and self.IsBottomLadderTouching then
+			self:UpOnLadder()
+		
+		elseif self.IsTopLadderTouching and self.IsBottomLadderTouching then
+			self:UpOnLadder()
+		end
+	end
+end
+
+]]></Code>
+    </CodeBlockEntityEventHandler>
+    <CodeBlockEntityEventHandler Name="HandlePhysicsContactBeginEvent" EventName="PhysicsContactBeginEvent" ParameterName="event" Target="self" Scope="Server">
+      <Code><![CDATA[
+-- ==================================================
+-- 다른 물리 오브젝트와 닿을 때, 이벤트를 받을 수 있습니다.
+-- (TagComponent를 활용해서, 장애물 판정, 넉백 등)
+-- ==================================================
+local ContactedBodyEntity = event.ContactedBodyEntity
+]]></Code>
+    </CodeBlockEntityEventHandler>
+  </EntityEventHandlers>
+</CodeBlockFile>

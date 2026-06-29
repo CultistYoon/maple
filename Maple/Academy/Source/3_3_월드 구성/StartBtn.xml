@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeBlockFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="834772f3-07f0-493a-9a33-caa13a901aa8" Language="Lua" Name="StartBtn" Type="Component" Source="None" ModifyTime="2026-06-19T10:25:20.2701659+09:00">
+  <CoreVersion Major="0" Minor="2" />
+  <ScriptVersion Major="1" Minor="1" />
+  <Description />
+  <Properties>
+    <CodeBlockProperty Name="Target" Type="Entity" DefaultValue="dd24bf80-d2b3-496c-9ea1-384caa761dc6" SyncDirection="None" />
+  </Properties>
+  <Methods />
+  <EntityEventHandlers>
+    <CodeBlockEntityEventHandler Name="HandleButtonClickEvent" EventName="ButtonClickEvent" ParameterName="event" Target="self" Scope="All">
+      <Code><![CDATA[
+-- Closing the title: hide it immediately for snappy feedback...
+if isvalid(self.Target) then
+	self.Target.Enable = false
+end
+
+-- ...and record the dismissal on the server (server_main) so it survives instance-room
+-- round trips. TitleManager re-hides the title on every map01 re-entry based on this flag.
+_TitleManager:MarkDismissed()
+
+local bgmRUID = "0428442a33fd48a193a1a39c1602cf0c"
+local volume = 1.0
+_SoundService:PlayBGM(bgmRUID, volume)
+]]></Code>
+    </CodeBlockEntityEventHandler>
+  </EntityEventHandlers>
+</CodeBlockFile>

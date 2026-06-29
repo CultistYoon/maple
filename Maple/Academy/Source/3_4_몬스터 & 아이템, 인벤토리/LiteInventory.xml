@@ -1,0 +1,148 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeBlockFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="139238c7-8224-454d-919a-637107bca104" Language="Lua" Name="LiteInventory" Type="Component" Source="None" ModifyTime="2026-04-07T22:23:03.8009188+09:00">
+  <CoreVersion Major="0" Minor="2" />
+  <ScriptVersion Major="1" Minor="1" />
+  <Description />
+  <Properties>
+    <CodeBlockProperty Name="IsInitialized" Type="boolean" DefaultValue="false" SyncDirection="All" />
+  </Properties>
+  <Methods>
+    <CodeBlockMethod Name="OnBeginPlay" ExecSpace="ServerOnly">
+      <Return Type="void" SyncDirection="None" />
+      <Code><![CDATA[
+self._T.inventoryData = {}
+for i = 1, _DataService:GetRowCount("UserItemDataSet") do
+	self._T.inventoryData[i] = 0
+end
+
+local userDataStorage = _DataStorageService:GetUserDataStorage(self.Entity.PlayerComponent.UserId)
+local errorCode, itemData = userDataStorage:GetAndWait("ItemData")
+
+if errorCode ~= 0 then
+    log(errorCode)
+    return
+end
+
+if itemData ~= nil then
+    local itemArr = _UtilLogic:Split(itemData, ",")
+    for i, v in ipairs(itemArr) do
+    	self._T.inventoryData[i] = tonumber(v)
+   end
+end
+
+local initEvent = OnInventoryInitialized()
+for i, v in ipairs(self._T.inventoryData) do
+    initEvent.AllItemCounts[i] = v
+end
+
+self._T.userDataStorage = userDataStorage
+
+self:SendInitializedEvent(initEvent)
+self.IsInitialized = true
+
+local saveInventory = function()
+	local dataConcatString = table.concat(self._T.inventoryData, ",")
+	self._T.userDataStorage:SetAsync("ItemData", dataConcatString, function() log("저장 완료") end)
+	log("저장 중...")
+end
+
+-- 저장 주기 설정
+local saveInterval = 300
+_TimerService:SetTimerRepeat(saveInventory, saveInterval, saveInterval)
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="SendInitializedEvent" ExecSpace="Multicast">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments>
+        <CodeBlockProperty Name="event" Type="OnInventoryInitialized" DefaultValue="" SyncDirection="None" />
+      </Arguments>
+      <Code><![CDATA[
+self.Entity:SendEvent(event)
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="ModifyItem" ExecSpace="ServerOnly">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments>
+        <CodeBlockProperty Name="itemIndex" Type="number" DefaultValue="0" SyncDirection="None" />
+        <CodeBlockProperty Name="deltaAmount" Type="number" DefaultValue="0" SyncDirection="None" />
+      </Arguments>
+      <Code><![CDATA[
+-- 아이템 인덱스가 정상인지 확인
+    if itemIndex < 1 or itemIndex > #self._T.inventoryData then
+    	log_error("itemIndex error")
+    	return
+    end
+
+    -- 변경 이전 아이템 개수 확인
+    local prevAmount = self._T.inventoryData[itemIndex]
+    -- 변경된 값을 계산함
+    local amountResult = prevAmount + deltaAmount
+
+    -- amountResult가 정상인지 체크함. 0보다 작으면 비정상이므로 0으로 변경
+    if amountResult < 0 then
+    	log_error("Item amount is less then zero")
+    	amountResult = 0
+    end
+
+    --amountResult가 정상이면 inventoryData를 amountResult로 변경
+    self._T.inventoryData[itemIndex] = amountResult
+
+local modifiedEvent = OnInventoryModified()
+modifiedEvent.ItemIndex = itemIndex
+modifiedEvent.ItemCount = amountResult
+-- UI에 SendModifiedEvent를 전달
+self:SendModifiedEvent(modifiedEvent)
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="SendModifiedEvent" ExecSpace="Multicast">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments>
+        <CodeBlockProperty Name="event" Type="OnInventoryModified" DefaultValue="" SyncDirection="None" />
+      </Arguments>
+      <Code><![CDATA[
+self.Entity:SendEvent(event)
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="RemoveItem" ExecSpace="ServerOnly">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments>
+        <CodeBlockProperty Name="itemIndex" Type="number" DefaultValue="0" SyncDirection="None" />
+      </Arguments>
+      <Code><![CDATA[
+if itemIndex < 1 or itemIndex > #self._T.inventoryData then
+    	log_error("itemIndex error")
+    	return
+    end
+
+    self._T.inventoryData[itemIndex] = 0
+
+    local modifiedEvent = OnInventoryModified()
+    modifiedEvent.ItemIndex = itemIndex
+    modifiedEvent.ItemCount = 0
+    self:SendModifiedEvent(modifiedEvent)
+]]></Code>
+    </CodeBlockMethod>
+  </Methods>
+  <EntityEventHandlers>
+    <CodeBlockEntityEventHandler Name="HandleUserLeaveEvent" EventName="UserLeaveEvent" ParameterName="event" Target="service:UserService" Scope="Server">
+      <Code><![CDATA[
+-- Parameters
+    local UserId = event.UserId
+    ---------------------------------------------------------
+
+    local thisUserId = self.Entity.PlayerComponent.UserId
+
+    if thisUserId ~= UserId then
+        return
+    end
+
+    -- 플레이를 끝낼 때 인벤토리 데이터 정보를 저장함
+    if self._T.userDataStorage then
+        local dataConcatString = table.concat(self._T.inventoryData, ",")
+        self._T.userDataStorage:SetAndWait("ItemData", dataConcatString)
+    end
+
+]]></Code>
+    </CodeBlockEntityEventHandler>
+  </EntityEventHandlers>
+</CodeBlockFile>

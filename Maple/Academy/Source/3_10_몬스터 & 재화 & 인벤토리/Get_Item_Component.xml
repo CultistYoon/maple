@@ -1,0 +1,85 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeBlockFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="4a35f469-5c8e-4ea5-be2d-f1a521ba266f" Language="Lua" Name="Get_Item_Component" Type="Component" Source="None" ModifyTime="2026-06-06T11:49:04.5343886+09:00">
+  <CoreVersion Major="0" Minor="2" />
+  <ScriptVersion Major="1" Minor="1" />
+  <Description />
+  <Properties>
+    <CodeBlockProperty Name="Coin" Type="number" DefaultValue="0" SyncDirection="All" />
+  </Properties>
+  <Methods>
+    <CodeBlockMethod Name="coin_count" ExecSpace="Client">
+      <Return Type="void" SyncDirection="None" />
+      <Code><![CDATA[
+local coin_count = _EntityService:GetEntityByPath("/ui/UIGroup/Inventory/InventoryPanel/CoinPanel/coin_count")
+local userCoin = tostring(self.Coin)
+coin_count.TextComponent.Text = userCoin
+log(self.Coin)
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="save_coin" ExecSpace="Server">
+      <Return Type="void" SyncDirection="None" />
+      <Code><![CDATA[
+local userId = self.Entity.PlayerComponent.UserId
+local userDataStorage = _DataStorageService:GetUserDataStorage(userId)
+local coinString = tostring(self.Coin)
+
+userDataStorage:SetAsync("userCoin", coinString, function(errorCode, key) 
+	if errorCode == 0 then
+		log("재화 저장 성공"..key)
+	else
+		log("재화 저장 실패"..tostring(errorCode))
+	end
+end)
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="OnBeginPlay" ExecSpace="ServerOnly">
+      <Return Type="void" SyncDirection="None" />
+      <Code><![CDATA[
+local userId = self.Entity.PlayerComponent.UserId
+local userDataStorage = _DataStorageService:GetUserDataStorage(userId)
+local errorCode, coinString = userDataStorage:GetAndWait("userCoin")
+
+if errorCode == 0 then
+	if _UtilLogic:IsNilorEmptyString(coinString) == false then
+		self.Coin = tonumber(coinString)
+	end
+	log("재화 로드 완료" .. tostring(self.Coin))
+else
+	log("재화 로드 실패")
+end
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="OnSyncProperty" ExecSpace="ClientOnly">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments>
+        <CodeBlockProperty Name="name" Type="string" SyncDirection="None" />
+        <CodeBlockProperty Name="value" Type="any" SyncDirection="None" />
+      </Arguments>
+      <Code><![CDATA[
+if name == "Coin" then
+	log("클라이언트 Coin 동기화 감지" .. tostring(value))
+	local coin_count = _EntityService:GetEntityByPath("/ui/UIGroup/Inventory/InventoryPanel/CoinPanel/coin_count")
+	if coin_count ~= nil then
+		coin_count.TextComponent.Text = tostring(value)
+	end
+end
+]]></Code>
+    </CodeBlockMethod>
+  </Methods>
+  <EntityEventHandlers>
+    <CodeBlockEntityEventHandler Name="HandleTriggerEnterEvent" EventName="TriggerEnterEvent" ParameterName="event" Target="self" Scope="All">
+      <Code><![CDATA[
+local TriggerBodyEntity = event.TriggerBodyEntity
+
+TriggerBodyEntity:Destroy()
+self.Coin = self.Coin + 1
+local soundRUID = "09242349927c4244a18da8276a37bbd4"
+_SoundService:PlaySound(soundRUID, 0.5)
+
+self:coin_count()
+self:save_coin()
+log("코인점수: "..self.Coin)
+]]></Code>
+    </CodeBlockEntityEventHandler>
+  </EntityEventHandlers>
+</CodeBlockFile>

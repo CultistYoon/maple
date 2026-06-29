@@ -1,0 +1,97 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeBlockFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="7982b719-3dda-417b-b7e1-c89ce815a5af" Language="Lua" Name="MonsterSpawn" Type="Component" Source="None" ModifyTime="2026-04-07T21:46:15.6567685+09:00">
+  <CoreVersion Major="0" Minor="2" />
+  <ScriptVersion Major="1" Minor="1" />
+  <Description />
+  <Properties>
+    <CodeBlockProperty Name="MaxSpawnCount" Type="number" DefaultValue="10" SyncDirection="All" />
+    <CodeBlockProperty Name="Time" Type="number" DefaultValue="0" SyncDirection="All" />
+    <CodeBlockProperty Name="MonsterArray" Type="table" DefaultValue="{}" SyncDirection="None" />
+  </Properties>
+  <Methods>
+    <CodeBlockMethod Name="SpawnMonster" ExecSpace="ServerOnly">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments>
+        <CodeBlockProperty Name="spawnCount" Type="number" DefaultValue="0" SyncDirection="None" />
+      </Arguments>
+      <Code><![CDATA[
+local parent = _EntityService:GetEntityByPath("/maps/map01")
+local nextNum = 0
+local positions = self:GetRandomPosition(spawnCount)
+
+for i = 1, #positions do
+	nextNum = #self.MonsterArray + 1
+	self.MonsterArray[nextNum] = _SpawnService:SpawnByModelId(
+	"model://maplestorymonster$001f609a932d49d2a8981e0089e2174e", 
+	"SpawnedMonster", 
+	positions[i], 
+	parent)
+end
+
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="OnBeginPlay" ExecSpace="ServerOnly">
+      <Return Type="void" SyncDirection="None" />
+      <Code><![CDATA[
+self.MonsterArray = {}
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="GetRandomPosition" ExecSpace="All">
+      <Return Type="table" DefaultValue="{}" SyncDirection="None" />
+      <Arguments>
+        <CodeBlockProperty Name="spawnCount" Type="number" DefaultValue="0" SyncDirection="None" />
+      </Arguments>
+      <Code><![CDATA[
+local leftX = -5.230
+local rightX = 5.092
+local y = 0.431 
+local areaWidth = rightX - leftX
+local positions = {}
+
+for i = 1, spawnCount do
+	local randomX = (_UtilLogic:RandomIntegerRange(0, 100) / 100) * areaWidth + leftX
+	positions[i] = Vector3(randomX, y, 0) 
+end
+
+return positions
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="GetCurMonsterCount" ExecSpace="All">
+      <Return Type="number" DefaultValue="0" SyncDirection="None" />
+      <Code><![CDATA[
+local i = 1
+while i <= #self.MonsterArray do
+	if isvalid(self.MonsterArray[i]) == true then
+		i = i + 1
+	else
+		table.remove(self.MonsterArray, i)
+	end
+end
+return #self.MonsterArray
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="OnUpdate" ExecSpace="ServerOnly">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments>
+        <CodeBlockProperty Name="delta" Type="number" SyncDirection="None" />
+      </Arguments>
+      <Code><![CDATA[
+self.Time = self.Time + delta
+
+if self.Time >= 5 then
+	self.Time = 0
+	local curMonsterCnt = self:GetCurMonsterCount()
+	if curMonsterCnt == nil then
+		return
+	end
+	
+	local spawnCount = self.MaxSpawnCount - curMonsterCnt
+	if spawnCount > 0 then
+		self:SpawnMonster(spawnCount)
+	end
+end
+]]></Code>
+    </CodeBlockMethod>
+  </Methods>
+  <EntityEventHandlers />
+</CodeBlockFile>

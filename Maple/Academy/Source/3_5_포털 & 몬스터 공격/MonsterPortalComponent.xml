@@ -1,0 +1,51 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeBlockFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="aa490d5e-bd7c-4964-aab2-91c9c58bc942" Language="Lua" Name="MonsterPortalComponent" Type="Component" Source="None" ModifyTime="2026-05-05T11:04:36.0937519+09:00">
+  <CoreVersion Major="0" Minor="2" />
+  <ScriptVersion Major="1" Minor="1" />
+  <Description />
+  <Properties>
+    <CodeBlockProperty Name="isLeft" Type="boolean" DefaultValue="false" SyncDirection="All" />
+    <CodeBlockProperty Name="Time" Type="number" DefaultValue="0" SyncDirection="All" />
+  </Properties>
+  <Methods>
+    <CodeBlockMethod Name="SetLocation" ExecSpace="All">
+      <Return Type="void" SyncDirection="None" />
+      <Code><![CDATA[
+if self.isLeft then
+	self.Entity.TransformComponent.Scale.x = -1
+end
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="OnBeginPlay" ExecSpace="ServerOnly">
+      <Return Type="void" SyncDirection="None" />
+      <Code><![CDATA[
+self:SetLocation()
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="OnUpdate" ExecSpace="ServerOnly">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments>
+        <CodeBlockProperty Name="delta" Type="number" SyncDirection="None" />
+      </Arguments>
+      <Code><![CDATA[
+self.Time = self.Time + delta
+if self.Time > 3 then
+	self:SpawnMonster()
+	self.Time = 0
+end
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="SpawnMonster" ExecSpace="All">
+      <Return Type="void" SyncDirection="None" />
+      <Code><![CDATA[
+local monsterID = "model://c3f9d550-ceae-43b5-aa20-5e113f3a371e"
+local monsterName = "monster"
+local x = self.Entity.TransformComponent.Position.x
+local y = self.Entity.TransformComponent.Position.y
+local parent = _EntityService:GetEntityByPath("/maps/map01")
+_SpawnService:SpawnByModelId(monsterID, monsterName, Vector3(x, y, 1), parent)
+]]></Code>
+    </CodeBlockMethod>
+  </Methods>
+  <EntityEventHandlers />
+</CodeBlockFile>

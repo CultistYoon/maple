@@ -1,0 +1,106 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeBlockFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="52b8356a-5237-44c8-8794-801a8b1ea74b" Language="Lua" Name="NPCTalk" Type="Component" Source="None" ModifyTime="2026-04-09T19:10:53.6457576+09:00">
+  <CoreVersion Major="0" Minor="2" />
+  <ScriptVersion Major="1" Minor="1" />
+  <Description />
+  <Properties>
+    <CodeBlockProperty Name="count" Type="number" DefaultValue="0" SyncDirection="None" />
+    <CodeBlockProperty Name="uiNameEntity" Type="Entity" DefaultValue="nil" SyncDirection="All" />
+    <CodeBlockProperty Name="uiMessageEntity" Type="Entity" DefaultValue="nil" SyncDirection="All" />
+    <CodeBlockProperty Name="uiTalkPanel" Type="Entity" DefaultValue="nil" SyncDirection="All" />
+    <CodeBlockProperty Name="uiPortraitEntity" Type="Entity" DefaultValue="nil" SyncDirection="All" />
+    <CodeBlockProperty Name="npcTalkData" Type="any" DefaultValue="nil" SyncDirection="None" />
+  </Properties>
+  <Methods>
+    <CodeBlockMethod Name="OnBeginPlay" ExecSpace="ClientOnly">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments />
+      <Code><![CDATA[
+log("hi")
+self.count = 1
+-- "NPCTalk"이라는 이름의 테이블을 가져옵니다.
+self.npcTalkData = _DataService:GetTable("NPCTalk")
+log(self.npcTalkData)
+
+-- 엔티티 경로를 통해 UI 요소들을 참조합니다.
+self.uiNameEntity = _EntityService:GetEntityByPath("/ui/UIGroup/TalkPanel/Name")
+self.uiMessageEntity = _EntityService:GetEntityByPath("/ui/UIGroup/TalkPanel/Text")
+self.uiTalkPanel = _EntityService:GetEntityByPath("/ui/UIGroup/TalkPanel")
+self.uiPortraitEntity = _EntityService:GetEntityByPath("/ui/UIGroup/TalkPanel/Portrait")
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="ShowNextText" ExecSpace="ClientOnly">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments />
+      <Code><![CDATA[
+local rowCount = self.npcTalkData:GetRowCount()
+    
+if self.count > rowCount then
+   self.uiTalkPanel.Enable = false
+   return
+end
+
+local isNameEnable = false
+local isPortraitEnable = false
+local message = self.npcTalkData:GetCell(self.count, "text")
+if message == nil then
+    self.uiTalkPanel.Enable = false
+    return
+else
+   self.uiTalkPanel.Enable = true
+   self.uiMessageEntity.TextComponent.Text = message
+end
+local name = self.npcTalkData:GetCell(self.count, "name")
+local portrait = self.npcTalkData:GetCell(self.count, "portrait")
+if name ~= "" then
+   isNameEnable = true
+   self.uiNameEntity.TextComponent.Text = name
+end
+if portrait ~= "" then
+   isPortraitEnable = true
+   self.uiPortraitEntity.SpriteGUIRendererComponent.ImageRUID = portrait
+end
+self.uiNameEntity.Enable = isNameEnable
+self.uiPortraitEntity.Enable = isPortraitEnable
+self.count = self.count + 1
+]]></Code>
+    </CodeBlockMethod>
+  </Methods>
+  <EntityEventHandlers>
+    <CodeBlockEntityEventHandler Name="HandleKeyDownEvent" EventName="KeyDownEvent" ParameterName="event" Target="service:InputService" Scope="Client">
+      <Code><![CDATA[
+--Parameters
+local key = event.key
+
+if key == KeyboardKey.Z then
+   self:ShowNextText()
+end
+]]></Code>
+    </CodeBlockEntityEventHandler>
+    <CodeBlockEntityEventHandler Name="HandleTriggerEnterEvent" EventName="TriggerEnterEvent" ParameterName="event" Target="self" Scope="All">
+      <Code><![CDATA[
+local TriggerBodyEntity = event.TriggerBodyEntity
+    
+if TriggerBodyEntity == nil then
+	return
+end
+    
+local playerComponent = TriggerBodyEntity.PlayerComponent
+
+if playerComponent == nil then
+	return
+end
+
+self:ShowNextText()
+log("충돌")
+
+]]></Code>
+    </CodeBlockEntityEventHandler>
+    <CodeBlockEntityEventHandler Name="HandleTriggerLeaveEvent" EventName="TriggerLeaveEvent" ParameterName="event" Target="self" Scope="All">
+      <Code><![CDATA[
+self.count = 1
+
+]]></Code>
+    </CodeBlockEntityEventHandler>
+  </EntityEventHandlers>
+</CodeBlockFile>

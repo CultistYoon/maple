@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeBlockFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="0738f7cd-80c7-48c2-bb71-cf84f4f072a5" Language="Lua" Name="Weapon" Type="ItemType" Source="None" ModifyTime="2026-05-06T12:54:45.4282257+09:00">
+  <CoreVersion Major="0" Minor="2" />
+  <ScriptVersion Major="1" Minor="1" />
+  <Description />
+  <Properties>
+    <CodeBlockProperty Name="Name" Type="string" DefaultValue="&quot;&quot;" SyncDirection="All" />
+    <CodeBlockProperty Name="MaxStackCount" Type="number" DefaultValue="0" SyncDirection="All" />
+    <CodeBlockProperty Name="Damage" Type="number" DefaultValue="0" SyncDirection="All" />
+  </Properties>
+  <Methods>
+    <CodeBlockMethod Name="OnCreate" ExecSpace="All">
+      <Return Type="void" SyncDirection="None" />
+      <Code><![CDATA[
+self.Name = self.ItemTableData:GetItem("Name")
+self.MaxStackCount = tonumber(self.ItemTableData:GetItem("MaxStackCount"))
+self.Damage = tonumber(self.ItemTableData:GetItem("Damage"))
+]]></Code>
+    </CodeBlockMethod>
+  </Methods>
+  <EntityEventHandlers />
+</CodeBlockFile>

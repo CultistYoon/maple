@@ -1,0 +1,40 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeBlockFile xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Id="18cc0370-ec1f-4b92-96d0-cde817177ac6" Language="Lua" Name="spawn" Type="Component" Source="None" ModifyTime="2026-06-06T10:10:45.3015307+09:00">
+  <CoreVersion Major="0" Minor="2" />
+  <ScriptVersion Major="1" Minor="1" />
+  <Description />
+  <Properties>
+    <CodeBlockProperty Name="Time" Type="number" DefaultValue="0" SyncDirection="All" />
+  </Properties>
+  <Methods>
+    <CodeBlockMethod Name="OnUpdate" ExecSpace="ServerOnly">
+      <Return Type="void" SyncDirection="None" />
+      <Arguments>
+        <CodeBlockProperty Name="delta" Type="number" SyncDirection="None" />
+      </Arguments>
+      <Code><![CDATA[
+self.Time = self.Time + delta 
+if self.Time > 3 then
+	self:spawn()
+	self.Time = 0
+end
+]]></Code>
+    </CodeBlockMethod>
+    <CodeBlockMethod Name="spawn" ExecSpace="All">
+      <Return Type="void" SyncDirection="None" />
+      <Code><![CDATA[
+local modelID = "model://345da0ca-d771-4f7b-89bb-924e0583ba17"
+local modelName = "monster"
+local parent = _EntityService:GetEntityByPath("/maps/map01")
+math.randomseed(os.time())
+for i= 1, 2, 1 do
+	local x = math.random(-50, 50) / 10
+	local position = Vector3(x, 0, 0)
+	_SpawnService:SpawnByModelId(modelID, modelName, position, parent)
+end
+
+]]></Code>
+    </CodeBlockMethod>
+  </Methods>
+  <EntityEventHandlers />
+</CodeBlockFile>
