@@ -1,0 +1,722 @@
+API Reference 가이드라인
+메이플스토리 월드의 API 레퍼런스는 월드 제작에 필요한 다양한 API와 로그 메시지에 관한 정보를 제공합니다.
+
+Components
+월드를 제작할 때 엔티티에 추가해 사용하는 기능 단위입니다. 프로퍼티, 함수를 갖고 있습니다.
+
+Events
+월드의 다양한 API에서 발생하는 이벤트입니다. 프로퍼티를 갖고 있습니다. 이벤트가 발생하는 공간 정보를 제공합니다.
+
+Services
+월드에서 시스템 제작과 관련된 핵심 기능을 제공합니다. 프로퍼티, 함수를 갖고 있습니다.
+
+Logics
+월드를 제작할 때 필요한 게임 로직입니다. 프로퍼티, 함수를 갖고 있습니다.
+
+Misc
+월드에서만 사용하는 고유한 타입을 의미합니다. 프로퍼티, 생성자, 함수를 갖고 있습니다.
+
+Enums
+서로 연결된 값의 집합입니다. 프로퍼티, 생성자, 함수를 갖고 있습니다.
+
+Lua
+메이플스토리 월드는 루아 5.3을 기본으로 사용합니다. 일부는 루아 5.3과 상이할 수 있습니다. 자세한 정보가 필요할 경우 루아 공식 홈페이지를 참고하길 바랍니다.
+
+LogMessages
+Log Messages는 메시지 종류에 따라 세 가지로 구분됩니다. Error Messages의 설명은 메이커와 동일하지 않으며, 해당 메시지가 발생하는 상황에 관해 설명합니다.
+
+Info Level: 정보성 메시지입니다. LIA 접두사로 구분합니다.
+
+Warning Level: 스크립트가 동작은 하지만 문제가 있는 경우 나타나는 메시지입니다. 권장하는 형태로 구현하지 않았을 수 있습니다. 혹은 의도대로 동작하지 않고 다른 동작을 할 수 있습니다. LWA 접두사로 구분합니다.
+
+Error Level: 정상 동작이 불가능한 경우이거나, 의도대로 동작하지 않아 결과를 얻을 수 없는 경우 나타나는 메시지입니다. LEA 접두사로 구분합니다.
+
+API 형식 소개
+API 레퍼런스는 가장 위에 API 관련 설명을 제공합니다. 아래에는 프로퍼티, 함수, 예제를 제공합니다.
+Example
+
+API 이름: API의 이름입니다.
+
+API 설명: 해당 API를 아우르는 전체적인 특성을 설명합니다.
+
+Properties: API의 프로퍼티에 대해 자세히 확인할 수 있습니다. 상속받은 프로퍼티가 있는 경우 inherited from 000아래에서 확인할 수 있습니다.
+
+Functions: API의 함수를 각각 설명합니다. 상속받은 API가 있는 경우 inherited from 000 아래에서 확인할 수 있습니다.
+
+Examples: API를 활용할 수 있는 다양한 예제 코드를 제공합니다.
+
+API별 구성
+API별로 상세 설명은 아래와 같은 형식으로 설명합니다.
+1
+
+타입 이름(인자 타입 인자 이름)
+
+
+타입: 프로퍼티, 함수, 이벤트에 따라 필요한 리턴 타입입니다. 리턴 타입의 관련 문서가 있다면 해당 문서로 연결되어 있습니다.
+
+이름: API의 프로퍼티, 함수, 이벤트 이름입니다.
+
+인자 타입: 인자가 사용하는 특정 타입입니다. 타입에 맞는 형식으로 인자 이름을 작성해야 합니다.
+
+인자 이름: API를 사용하기 위해 필요한 파라미터입니다. 생략 가능한 파라미터와 가변 파라미터 정보를 제공합니다. 기본 파라미터와 "=nil"이 병기되어 있다면 생략할 수 있는 파라미터입니다.
+
+생략 가능한 인자 이름 표기 예시: CollisionGroup=nil
+
+가변 인자 이름 표기 예시: any... args
+
+배지 색상
+동기화 정보 배지
+Sync : 일반적으로 서버에서 클라이언트로 값이 동기화되는 API를 의미합니다.
+실행공간 제어 관련 배지
+ReadOnly : 값이 읽기 전용이라 덮어쓸 수 없는 API를 의미합니다.
+
+ControlOnly: 조작 권한을 가진 환경 전용 함수입니다. 그 환경에서만 호출됩니다.
+
+MakerOnly: 메이커에서만 사용할 수 있습니다.
+
+ReleaseOnly : 출시된 월드에서만 사용할 수 있습니다.
+
+ServerOnly : 서버 전용 함수입니다. 서버에서만 호출됩니다.
+
+ClientOnly : 클라이언트 전용 함수입니다. 클라이언트에서만 호출됩니다.
+
+Server: 서버에서 실행되는 함수입니다. 클라이언트에서 호출 시, 서버에 요청해 호출합니다.
+
+Client: 클라이언트에서 실행되는 함수입니다. 서버에서 호출 시, 클라이언트들에게 전달해 호출합니다.
+
+프로퍼티 관련 배지
+
+HideFromInspector: 메이커의 프로퍼티 창에 노출되지 않는 프로퍼티를 의미합니다. 스크립트 에디터에서 접근할 수 있습니다.
+
+함수 관련 배지
+
+Yield: 수행하는 동안 스크립트 실행을 중단하는 API를 의미합니다.
+
+Static: 전역으로 접근할 수 있는 API를 의미합니다.
+
+스크립트 관련 배지
+
+ScriptOverridable: 재정의할 수 있는 함수를 의미합니다.
+
+타입 관련 배지
+
+Abstract: 자체적으로 Component 생성이 불가능한 추상화된 API를 의미합니다.
+
+API 상태 관련 배지
+
+Deprecated: 더는 사용하지 않는 API입니다.
+
+Preview: 크리에이터에게 선공개된 API입니다. 추후 정식 배포될 API와 다를 수 있습니다.
+
+API Event 관련 배지
+
+SpaceServer: 이벤트가 발생한 공간을 의미합니다. Server에서 이벤트가 발생합니다.
+
+SpaceClient: 이벤트가 발생한 공간을 의미합니다. Client에서 이벤트가 발생합니다.
+
+SpaceEditor: 이벤트가 발생한 공간을 의미합니다. Editor에서 이벤트가 발생합니다.
+
+SpaceAll: 이벤트가 발생한 공간을 의미합니다. Server, Client에서 이벤트가 발생합니다.
+Components
+AIChaseComponent
+AIComponent
+AIWanderComponent
+AreaParticleComponent
+AttackComponent
+AvatarBodyActionSelectorComponent
+AvatarFaceActionSelectorComponent
+AvatarGUIRendererComponent
+AvatarRendererComponent
+AvatarStateAnimationComponent
+BackgroundComponent
+BaseParticleComponent
+BasicParticleComponent
+ButtonComponent
+CameraComponent
+CanvasGroupComponent
+ChatBalloonComponent
+ChatComponent
+ClimbableComponent
+ClimbableSpriteRendererComponent
+Component
+CostumeManagerComponent
+CustomFootholdComponent
+DamageSkinComponent
+DamageSkinSettingComponent
+DamageSkinSpawnerComponent
+DirectionSynchronizerComponent
+DistanceJointComponent
+FootholdComponent
+GridViewComponent
+HitComponent
+HitEffectSpawnerComponent
+ImageComponent
+InteractionComponent
+InventoryComponent
+JoystickComponent
+KinematicbodyComponent
+LightComponent
+LineGUIRendererComponent
+LineRendererComponent
+MapComponent
+MapLayerComponent
+MaskComponent
+MovementComponent
+NameTagComponent
+OverlayLightComponent
+PhysicsColliderComponent
+PhysicsRigidbodyComponent
+PhysicsSimulatorComponent
+PixelGUIRendererComponent
+PixelRendererComponent
+PlayerComponent
+PlayerControllerComponent
+PolygonGUIRendererComponent
+PolygonRendererComponent
+PortalComponent
+PrismaticJointComponent
+PulleyJointComponent
+RawImageGUIRendererComponent
+RawImageRendererComponent
+RectTileMapComponent
+RevoluteJointComponent
+RigidbodyComponent
+ScrollLayoutGroupComponent
+SideviewbodyComponent
+SkeletonGUIRendererComponent
+SkeletonRendererComponent
+SliderComponent
+SoundComponent
+SpawnLocationComponent
+SpriteGUIRendererComponent
+SpriteParticleComponent
+SpriteRendererComponent
+StateAnimationComponent
+StateComponent
+StateStringToAvatarActionComponent
+StateStringToMonsterActionComponent
+TagComponent
+TextComponent
+TextGUIRendererComponent
+TextGUIRendererInputComponent
+TextInputComponent
+TextRendererComponent
+TileMapComponent
+TouchReceiveComponent
+TransformComponent
+TriggerComponent
+TweenBaseComponent
+TweenCircularComponent
+TweenFloatingComponent
+TweenLineComponent
+UIAreaParticleComponent
+UIBaseParticleComponent
+UIBasicParticleComponent
+UIGroupComponent
+UISpriteParticleComponent
+UITouchReceiveComponent
+UITransformComponent
+WebSpriteComponent
+WebViewComponent
+WeldJointComponent
+WheelJointComponent
+WorldComponent
+YoutubePlayerCommonComponent
+YoutubePlayerGUIComponent
+YoutubePlayerWorldComponent
+
+AIChaseComponent
+플레이어나 다른 엔티티를 추적하는 AI입니다. StateComponent가 없다면 자동으로 추가됩니다.
+
+Properties
+float DetectionRange
+추적 감지 거리입니다. 대상의 거리가 이보다 멀어지면 추적을 중단하고, 가까워지면 다시 추적을 시작합니다.
+boolean IsChaseNearPlayer
+값이 true인 경우 DetectionRange 프로퍼티 값 내에서 가장 가까운 플레이어를 자동으로 추적합니다. TargetEntityRef 프로퍼티 또는 SetTarget(Entity) 함수로 지정한 대상이 있는 경우 플레이어 대신 지정한 대상을 추적합니다.
+EntityRef TargetEntityRef ReadOnly
+추적 대상이 될 엔티티를 정합니다.
+inherited from AIComponent:
+string BehaviourTreeId ReadOnly
+행동 트리 엔트리의 고유 식별자입니다.
+Blackboard BlackBoard ReadOnly
+AI 행동 트리에서 사용하는 데이터 저장소입니다. 키-값 쌍으로 데이터를 관리하며 행동 트리 노드 간 데이터를 공유합니다.
+boolean IsLegacy ReadOnly
+Legacy 시스템 지원 여부를 설정합니다. 이전 시스템은 노드의 Running 상태를 구현하기 위해 ExclusiveExecutionWhenRunning 프로퍼티를 사용해야 합니다. Legacy 시스템은 더 이상 지원하지 않으며, 추후 삭제 예정입니다.
+boolean LogEnabled ReadOnly
+값이 true면 행동 트리가 실행될 때 실행 관련 정보가 로그로 출력됩니다. 메이커 환경에서만 동작합니다.
+UpdateAuthorityType UpdateAuthority ReadOnly
+업데이트 권한입니다. Server와 Client 중 설정한 곳에서 실행됩니다.
+inherited from Component:
+boolean Enable Sync
+컴포넌트 활성화 여부를 확인합니다.
+boolean EnableInHierarchy ReadOnly HideFromInspector
+계층 구조상에서 이 컴포넌트가 Enable 상태인지를 반환합니다. Enable이 true일지라도 엔티티의 Enable이 false라면 false를 반환합니다.
+Entity Entity ReadOnly
+이 컴포넌트를 소유한 엔티티입니다.
+Methods
+Entity GetCurrentTarget()
+추적 대상 엔티티를 반환합니다.
+void SetTarget(Entity targetEntity)
+targetEntity를 추적하도록 설정합니다. 함수 호출 시 IsChaseNearPlayer 프로퍼티는 자동으로 비활성화됩니다
+inherited from AIComponent:
+BTNode CreateLeafNode(string nodeName, func<float> -> BehaviourTreeStatus onBehaveFunction)
+Action 노드를 생성합니다. 노드가 실행될 때 onBehaveFunction으로 전달된 함수가 호출됩니다. onBehaveFunction의 매개 변수는 프레임당 시간인 delta입니다.
+BTNode CreateNode(string nodeType, string nodeName = nil, func<float> -> BehaviourTreeStatus onBehaveFunction = nil)
+BTNodeType을 기반으로 Action 노드를 생성합니다. nodeType은 BTNodeType의 타입명입니다. onBehaveFunction가 nil이 아니라면 노드가 실행될 때 BTNodeType의 OnInit(), OnBehave() 함수 대신 onBehaveFunction으로 전달된 함수가 호출됩니다. onBehaveFunction의 매개 변수는 프레임당 시간인 delta입니다.
+void SetRootNode(BTNode node)
+node를 최상위 노드로 설정합니다.
+inherited from Component:
+boolean IsClient()
+현재 실행 환경이 클라이언트인지 아닌지의 여부를 반환합니다.
+boolean IsServer()
+현재 실행 환경이 서버인지 아닌지의 여부를 반환합니다.
+Examples
+몬스터가 가까이 있는 적을 무작정 따라가지 않고, 자신을 공격한 대상을 추적하는 예제입니다.
+Chase 몬스터에 예제 코드를 작성한 컴포넌트를 추가해 사용할 수 있습니다.
+
+Method:
+[server only]
+void OnBeginPlay ()
+{
+	local aiChaseComponent = self.Entity.AIChaseComponent
+	if aiChaseComponent == nil then
+		return
+	end
+	 
+	aiChaseComponent.IsChaseNearPlayer = false
+	 
+	local chatBallon = self.Entity.ChatBalloonComponent
+	if chatBallon == nil then
+		chatBallon = self.Entity:AddComponent(ChatBalloonComponent)
+	end
+	 
+	chatBallon.ChatModeEnabled = false
+	chatBallon.ShowDuration = 1
+	chatBallon.HideDuration = 0
+	chatBallon.FontSize = 1.2
+}
+
+[server only]
+void OnUpdate (number delta)
+{
+	if self.Entity.ChatBalloonComponent == nil then
+		return
+	end
+
+	local currentTargetEntity = self.Entity.AIChaseComponent:GetCurrentTarget()
+	if currentTargetEntity == nil then
+		self.Entity.ChatBalloonComponent.AutoShowEnabled = false
+	else
+		self.Entity.ChatBalloonComponent.AutoShowEnabled = true
+		self.Entity.ChatBalloonComponent.Message = "target is "..currentTargetEntity.Name
+	end
+}
+
+Event Handler:
+[self]
+HandleHitEvent (HitEvent event)
+{
+	--------------- Native Event Sender Info ----------------
+	-- Sender: HitComponent
+	-- Space: Server, Client
+	---------------------------------------------------------
+	 
+	-- Parameters
+	local AttackCenter = event.AttackCenter
+	local AttackerEntity = event.AttackerEntity
+	local Damages = event.Damages
+	local Extra = event.Extra
+	local FeedbackAction = event.FeedbackAction
+	local IsCritical = event.IsCritical
+	local TotalDamage = event.TotalDamage
+	---------------------------------------------------------
+	if self.Entity.AIChaseComponent == nil then
+		return
+	end
+	 
+	self.Entity.AIChaseComponent:SetTarget(AttackerEntity)
+}
+SeeAlso
+AIComponent
+
+StateComponent
+
+AIComponent
+엔티티에 AI를 부여하기 위한 행동 트리 기능을 제공합니다.
+
+Properties
+string BehaviourTreeId ReadOnly
+행동 트리 엔트리의 고유 식별자입니다.
+Blackboard BlackBoard ReadOnly
+AI 행동 트리에서 사용하는 데이터 저장소입니다. 키-값 쌍으로 데이터를 관리하며 행동 트리 노드 간 데이터를 공유합니다.
+boolean IsLegacy ReadOnly
+Legacy 시스템 지원 여부를 설정합니다. 이전 시스템은 노드의 Running 상태를 구현하기 위해 ExclusiveExecutionWhenRunning 프로퍼티를 사용해야 합니다. Legacy 시스템은 더 이상 지원하지 않으며, 추후 삭제 예정입니다.
+boolean LogEnabled ReadOnly
+값이 true면 행동 트리가 실행될 때 실행 관련 정보가 로그로 출력됩니다. 메이커 환경에서만 동작합니다.
+UpdateAuthorityType UpdateAuthority ReadOnly
+업데이트 권한입니다. Server와 Client 중 설정한 곳에서 실행됩니다.
+inherited from Component:
+boolean Enable Sync
+컴포넌트 활성화 여부를 확인합니다.
+boolean EnableInHierarchy ReadOnly HideFromInspector
+계층 구조상에서 이 컴포넌트가 Enable 상태인지를 반환합니다. Enable이 true일지라도 엔티티의 Enable이 false라면 false를 반환합니다.
+Entity Entity ReadOnly
+이 컴포넌트를 소유한 엔티티입니다.
+Methods
+BTNode CreateLeafNode(string nodeName, func<float> -> BehaviourTreeStatus onBehaveFunction)
+Action 노드를 생성합니다. 노드가 실행될 때 onBehaveFunction으로 전달된 함수가 호출됩니다. onBehaveFunction의 매개 변수는 프레임당 시간인 delta입니다.
+BTNode CreateNode(string nodeType, string nodeName = nil, func<float> -> BehaviourTreeStatus onBehaveFunction = nil)
+BTNodeType을 기반으로 Action 노드를 생성합니다. nodeType은 BTNodeType의 타입명입니다. onBehaveFunction가 nil이 아니라면 노드가 실행될 때 BTNodeType의 OnInit(), OnBehave() 함수 대신 onBehaveFunction으로 전달된 함수가 호출됩니다. onBehaveFunction의 매개 변수는 프레임당 시간인 delta입니다.
+void SetRootNode(BTNode node)
+node를 최상위 노드로 설정합니다.
+inherited from Component:
+boolean IsClient()
+현재 실행 환경이 클라이언트인지 아닌지의 여부를 반환합니다.
+boolean IsServer()
+현재 실행 환경이 서버인지 아닌지의 여부를 반환합니다.
+Examples
+몬스터가 잠을 자다가 플레이어가 다가오면 다가오지 말라고 말하는 예제입니다.
+AIComponent를 Extend해 사용합니다. 작성한 스크립트 컴포넌트를 static 몬스터에 추가해 사용합니다.
+
+Property:
+[Sync]
+number DetectDistance = 4
+
+Method:
+[server only]
+void OnBeginPlay ()
+{
+	local chatBallon = self.Entity.ChatBalloonComponent
+	if chatBallon == nil then
+		chatBallon = self.Entity:AddComponent(ChatBalloonComponent)
+	end
+	 
+	self._T.nearestPlayer = nil
+	 
+	chatBallon.AutoShowEnabled = true
+	chatBallon.ChatModeEnabled = false
+	chatBallon.ShowDuration = 1
+	chatBallon.HideDuration = 0
+	chatBallon.FontSize = 1.5
+	 
+	local function isNearPlayer(deltaTime)
+		local players = _UserService:GetUsersByMapComponent(self.Entity.CurrentMap.MapComponent)
+		self._T.nearestPlayer = nil
+		local dist = math.maxinteger
+		for i, player in pairs(players) do
+			if isvalid(player) then
+				local distTemp = Vector2.Distance(
+				player.TransformComponent.Position:ToVector2(), self.Entity.TransformComponent.Position:ToVector2())
+				dist = math.min(dist, distTemp)
+				if dist <= self.DetectDistance then
+					self._T.nearestPlayer = player
+				end
+			end
+		end
+	     
+		if self._T.nearestPlayer == nil then
+			return BehaviourTreeStatus.Failure
+		else
+			return BehaviourTreeStatus.Success
+		end
+	end
+	 
+	local function lookAtNearestPlayer(deltaTime)
+		local flipX = self.Entity.TransformComponent.Position.x < self._T.nearestPlayer.TransformComponent.Position.x
+		self.Entity.SpriteRendererComponent.FlipX = flipX
+		return BehaviourTreeStatus.Success
+	end
+	 
+	local function warn(deltaTime)
+		chatBallon.Message = "Don't come!"
+		return BehaviourTreeStatus.Success
+	end
+	 
+	local function sleep(deltaTime)
+		chatBallon.Message = "Zzz..."
+		return BehaviourTreeStatus.Success
+	end
+	 
+	local rootNode = SelectorNode("Root")
+	 
+	local alertSeq = SequenceNode("AlertSequence")
+	alertSeq:AttachChild(self:CreateLeafNode("IsNearPlayer", isNearPlayer))
+	alertSeq:AttachChild(self:CreateLeafNode("LookAtNearestPlayer", lookAtNearestPlayer))
+	alertSeq:AttachChild(self:CreateLeafNode("Warn", warn))
+	 
+	rootNode:AttachChild(alertSeq)
+	rootNode:AttachChild(self:CreateLeafNode("Sleep", sleep))
+	 
+	self:SetRootNode(rootNode)
+}
+SeeAlso
+ChatBalloonComponent
+
+SpriteRendererComponent
+
+TransformComponent
+
+BTNode
+
+SelectorNode
+
+SequenceNode
+
+UserService
+
+행동 트리를 활용한 AI 만들기
+
+AIWanderComponent
+주변을 배회하는 AI입니다. StateComponent가 없다면 자동으로 추가됩니다.
+
+Properties
+inherited from AIComponent:
+string BehaviourTreeId ReadOnly
+행동 트리 엔트리의 고유 식별자입니다.
+Blackboard BlackBoard ReadOnly
+AI 행동 트리에서 사용하는 데이터 저장소입니다. 키-값 쌍으로 데이터를 관리하며 행동 트리 노드 간 데이터를 공유합니다.
+boolean IsLegacy ReadOnly
+Legacy 시스템 지원 여부를 설정합니다. 이전 시스템은 노드의 Running 상태를 구현하기 위해 ExclusiveExecutionWhenRunning 프로퍼티를 사용해야 합니다. Legacy 시스템은 더 이상 지원하지 않으며, 추후 삭제 예정입니다.
+boolean LogEnabled ReadOnly
+값이 true면 행동 트리가 실행될 때 실행 관련 정보가 로그로 출력됩니다. 메이커 환경에서만 동작합니다.
+UpdateAuthorityType UpdateAuthority ReadOnly
+업데이트 권한입니다. Server와 Client 중 설정한 곳에서 실행됩니다.
+inherited from Component:
+boolean Enable Sync
+컴포넌트 활성화 여부를 확인합니다.
+boolean EnableInHierarchy ReadOnly HideFromInspector
+계층 구조상에서 이 컴포넌트가 Enable 상태인지를 반환합니다. Enable이 true일지라도 엔티티의 Enable이 false라면 false를 반환합니다.
+Entity Entity ReadOnly
+이 컴포넌트를 소유한 엔티티입니다.
+Methods
+inherited from AIComponent:
+BTNode CreateLeafNode(string nodeName, func<float> -> BehaviourTreeStatus onBehaveFunction)
+Action 노드를 생성합니다. 노드가 실행될 때 onBehaveFunction으로 전달된 함수가 호출됩니다. onBehaveFunction의 매개 변수는 프레임당 시간인 delta입니다.
+BTNode CreateNode(string nodeType, string nodeName = nil, func<float> -> BehaviourTreeStatus onBehaveFunction = nil)
+BTNodeType을 기반으로 Action 노드를 생성합니다. nodeType은 BTNodeType의 타입명입니다. onBehaveFunction가 nil이 아니라면 노드가 실행될 때 BTNodeType의 OnInit(), OnBehave() 함수 대신 onBehaveFunction으로 전달된 함수가 호출됩니다. onBehaveFunction의 매개 변수는 프레임당 시간인 delta입니다.
+void SetRootNode(BTNode node)
+node를 최상위 노드로 설정합니다.
+inherited from Component:
+boolean IsClient()
+현재 실행 환경이 클라이언트인지 아닌지의 여부를 반환합니다.
+boolean IsServer()
+현재 실행 환경이 서버인지 아닌지의 여부를 반환합니다.
+SeeAlso
+StateComponent
+
+AreaParticleComponent
+생성 영역을 조절할 수 있는 파티클 효과를 만드는 기능을 제공합니다. 눈, 비, 안개 같은 파티클이 해당합니다.
+
+Properties
+Vector2 AreaOffset Sync
+엔티티를 기준으로 생성 범위의 중심점 위치를 설정합니다.
+Vector2 AreaSize Sync
+파티클 생성 범위의 너비와 높이를 지정합니다.
+AreaParticleType ParticleType Sync
+생성할 파티클 타입을 설정합니다.
+inherited from BaseParticleComponent:
+boolean AutoRandomSeed Sync
+파티클 입자 방출이 시작될 때마다 랜덤 시드를 새로 생성할지 여부를 설정합니다.
+Color Color Sync
+렌더링될 파티클의 색상을 보정합니다.
+boolean IgnoreMapLayerCheck Sync
+SortingLayer에 Map Layer 이름을 지정했을 때 자동 치환을 수행하지 않습니다.
+boolean IsEmitting Sync ReadOnly HideFromInspector
+새 파티클을 방출하고 있는지를 나타냅니다.
+LitMode LitMode Sync
+머티리얼 또는 오브젝트가 광원의 영향을 받을지 여부를 결정하는 렌더링 방식을 선택합니다.
+boolean Loop Sync
+파티클 반복 재생 여부를 설정합니다.
+int32 OrderInLayer Sync
+같은 Layer 내의 우선순위를 결정합니다. 수가 클수록 앞에 보입니다.
+float ParticleCount Sync
+파티클 입자 개수를 설정합니다.
+float ParticleLifeTime Sync
+파티클 입자의 지속시간을 설정합니다.
+float ParticleSize Sync
+파티클 입자의 크기를 설정합니다.
+float ParticleSpeed Sync
+파티클 입자의 속도를 설정합니다.
+boolean PlayOnEnable Sync
+파티클 컴포넌트가 Enable일 때, 파티클을 재생할지 여부를 설정합니다.
+float PlaySpeed Sync
+파티클 재생 속도를 설정합니다.
+boolean Prewarm Sync
+값이 true일 경우 파티클이 처음 재생될 때 이미 재생되고 있었던 것과 같은 상태로 시작합니다.
+integer RandomSeed Sync
+파티클이 재생될 때의 생성 위치, 방출 방향, 속도 등을 결정하기 위해 사용하는 랜덤 시드를 설정합니다.
+string SortingLayer Sync
+2개 이상의 엔티티가 겹쳤을 때 Sorting Layer에 따라 보이는 우선순위가 결정됩니다.
+inherited from Component:
+boolean Enable Sync
+컴포넌트 활성화 여부를 확인합니다.
+boolean EnableInHierarchy ReadOnly HideFromInspector
+계층 구조상에서 이 컴포넌트가 Enable 상태인지를 반환합니다. Enable이 true일지라도 엔티티의 Enable이 false라면 false를 반환합니다.
+Entity Entity ReadOnly
+이 컴포넌트를 소유한 엔티티입니다.
+Methods
+inherited from BaseParticleComponent:
+void Play()
+파티클을 재생합니다.
+void Stop()
+파티클 재생을 멈춥니다.
+inherited from Component:
+boolean IsClient()
+현재 실행 환경이 클라이언트인지 아닌지의 여부를 반환합니다.
+boolean IsServer()
+현재 실행 환경이 서버인지 아닌지의 여부를 반환합니다.
+Events
+OrderInLayerChangedEvent
+Component의 OrderInLayer가 변경되었을 때 발생하는 이벤트입니다.
+ParticleEmitEndEvent
+파티클의 방출이 종료되었을 때 BaseParticleComponent에서 발생하는 이벤트입니다.
+ParticleEmitStartEvent
+파티클 입자 방출이 시작될 때 발생하는 이벤트입니다.
+ParticleLoopEvent
+Loop 프로퍼티가 활성화 된 경우, 파티클의 방출 주기가 돌아와서 방출을 반복할 때 발생하는 이벤트입니다.
+SortingLayerChangedEvent
+컴포넌트의 SortingLayer가 변경되었을 때 발생하는 이벤트입니다.
+Examples
+파티클을 재생, 정지시키고 AreaSize를 조절하는 예제입니다.
+
+Property:
+[Sync]
+AreaParticleComponent ParticleComponent = nil
+
+Method:
+[client only]
+void OnBeginPlay()
+{
+	self.ParticleComponent = self.Entity.AreaParticleComponent	 
+	self.ParticleComponent.AreaSize.x = _UtilLogic:RandomDouble() * 2
+	self.ParticleComponent.ParticleCount = 2
+}
+
+Event Handler:
+[service: InputService]
+HandleKeyDownEvent(KeyDownEvent event)
+{
+	----------------- Native Emitter Info ------------------
+	-- Emitter: InputService
+	-- Space: Client
+	--------------------------------------------------------
+	 
+	-- Parameters
+	local key = event.key
+	--------------------------------------------------------
+	if key == KeyboardKey.Q then
+		self.ParticleComponent:Stop()
+	elseif key == KeyboardKey.E then
+		self.ParticleComponent:Play()
+	end
+}
+SeeAlso
+KeyboardKey
+
+UtilLogic
+
+InputService
+
+ParticleService
+
+파티클 사용하기
+
+파티클 활용하기
+
+AttackComponent
+HitComponent와 연동해 공격 기능을 구현할 수 있는 인터페이스를 제공합니다.
+
+Properties
+inherited from Component:
+boolean Enable Sync
+컴포넌트 활성화 여부를 확인합니다.
+boolean EnableInHierarchy ReadOnly HideFromInspector
+계층 구조상에서 이 컴포넌트가 Enable 상태인지를 반환합니다. Enable이 true일지라도 엔티티의 Enable이 false라면 false를 반환합니다.
+Entity Entity ReadOnly
+이 컴포넌트를 소유한 엔티티입니다.
+Methods
+table<Component> Attack(Shape shape, string attackInfo, CollisionGroup collisionGroup = nil)
+shape 영역 안에 있는 HitComponent의 OnHit(Entity, Integer, boolean, string, int32) 함수를 호출하고 HitEvent를 발생시킵니다. 공격 대상으로 판정된 HitComponent를 모두 반환합니다.
+attackInfo는 사용자 정의 데이터로 공격을 직접 구현할 때 크리에이터가 원하는 용도에 맞게 활용할 수있습니다. 활용 시 함수를 재정의해야 합니다.
+table<Component> Attack(Vector2 size, Vector2 offset, string attackInfo, CollisionGroup collisionGroup = nil)
+사각형 영역을 지정할 수 있는 Attack 함수입니다. size는 사각형의 크기, offset은 엔티티 사각형의 중심 위치입니다.
+void AttackFast(Shape shape, string attackInfo, CollisionGroup collisionGroup = nil)
+반환 값이 없는 Attack 함수입니다. 불필요한 table 객체 생성을 줄여 월드 성능을 개선할 수 있습니다.
+table<Component> AttackFrom(Vector2 size, Vector2 position, string attackInfo, CollisionGroup collisionGroup = nil)
+사각형 영역을 지정할 수 있는 Attack 함수입니다. size는 사각형의 크기, position은 월드 좌표 기준 사각형의 중심 위치입니다.
+boolean CalcCritical(Entity attacker, Entity defender, string attackInfo) custom
+크리티컬 공격 여부를 결정합니다. 기본 동작은 항상 false를 반환하므로 크리티컬 공격을 하지 않습니다.
+integer CalcDamage(Entity attacker, Entity defender, string attackInfo) custom
+대미지 값을 결정합니다. 기본 동작은 항상 1을 반환합니다.
+float GetCriticalDamageRate() custom
+크리티컬 공격일 경우, 기본 대미지 대비 몇 배의 대미지를 줄 것인지 결정합니다. 기본 동작은 항상 2를 반환합니다.
+int32 GetDisplayHitCount(string attackInfo) custom
+한 번의 공격을 몇 개의 히트로 분할하여 표시할 지 결정합니다. 기본 동작은 항상 1을 반환합니다.
+boolean IsAttackTarget(Entity defender, string attackInfo) custom
+defender가 공격 대상인지 판단합니다. false를 반환하면 Attack(), AttackFrom(), AttackFast() 함수의 공격 대상에서 제외됩니다. 기본 동작은 defender의 StateComponent의 현재 상태가 'DEAD'인 경우, 본인과 상대가 모두 플레이어면서 상대 PlayerComponent의 PVPMode 프로퍼티 값이 false인 경우에 false를 반환합니다.
+void OnAttack(Entity defender) custom
+이 엔티티가 공격할 때 호출되는 함수입니다.
+inherited from Component:
+boolean IsClient()
+현재 실행 환경이 클라이언트인지 아닌지의 여부를 반환합니다.
+boolean IsServer()
+현재 실행 환경이 서버인지 아닌지의 여부를 반환합니다.
+Events
+AttackEvent
+엔티티가 공격할 때 발생하는 이벤트입니다. AttackComponent에서 발생합니다.
+Examples
+AttackComponent를 재정의 해 크리에이터가 공격 방식을 직접 구현할 수 있습니다.사각형 영역에 들어온 몬스터에게 공격을 가하는 예제입니다.
+
+Method:
+[server only]
+void AttackNormal ()
+{
+	local attackSize = Vector2(1,1)
+	local playerController = self.Entity.PlayerControllerComponent
+	 
+	if playerController ~= nil then
+	local attackOffset = Vector2(0.5 * playerController.LookDirectionX, 0.5)
+		self:Attack(attackSize, attackOffset, nil, CollisionGroups.Monster)
+	end
+}
+ 
+-- 대미지 계산 방법을 정의합니다
+override int CalcDamage (Entity attacker,Entity defender,string attackInfo)
+{
+	return 50
+}
+ 
+-- 크리티컬 대미지 계산 방법을 정의합니다.
+override boolean CalcCritical (Entity attacker,Entity defender,string attackInfo)
+{
+	return _UtilLogic:RandomDouble() < 0.3
+}
+ 
+-- 크리티컬 데미지 발생 확률을 정의합니다.
+override number GetCriticalDamageRate ()
+{
+	return 2
+}
+
+Event Handler:
+[self]
+HandlePlayerActionEvent (PlayerActionEvent event)
+{
+	-- Parameters
+	local ActionName = event.ActionName
+	local PlayerEntity = event.PlayerEntity
+	--------------------------------------------------------
+	if self:IsClient() then return end
+	 
+	if ActionName == "Attack" then
+		self:AttackNormal()
+	end
+}
+SeeAlso
+HitComponent
+
+PlayerControllerComponent
+
+CollisionService
+
+공격과 피격
